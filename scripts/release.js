@@ -23,6 +23,7 @@ const COPY_ENTRIES = [
   "fb-saver-content.css",
   "icon.png",
   "profile_image.jpg",
+  "profile-images",
   "database",
   "vendor/tailwind.css"
 ];
