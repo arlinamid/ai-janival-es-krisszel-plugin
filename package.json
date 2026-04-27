@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build:css": "node node_modules/@tailwindcss/cli/dist/index.mjs -i tailwind.input.css -o vendor/tailwind.css",
-    "watch:css": "node node_modules/@tailwindcss/cli/dist/index.mjs -i tailwind.input.css -o vendor/tailwind.css --watch"
+    "watch:css": "node node_modules/@tailwindcss/cli/dist/index.mjs -i tailwind.input.css -o vendor/tailwind.css --watch",
+    "build:release": "node scripts/release.js"
   }
 }
