@@ -18,10 +18,8 @@ const distOnly = process.argv.includes("--dist-only");
 
 const COPY_ENTRIES = [
   "manifest.json",
-  "background.js",
   "sidepanel.html",
   "styles.css",
-  "fb-saver-content.js",
   "fb-saver-content.css",
   "icon.png",
   "profile_image.jpg",
@@ -83,6 +81,28 @@ async function runEsbuildBundle() {
     entryPoints: [path.join(ROOT, "sidepanel.js")],
     bundle: true,
     outfile: path.join(DIST, "sidepanel.js"),
+    platform: "browser",
+    format: "iife",
+    target: ["chrome120"],
+    minify: true,
+    sourcemap: false
+  });
+
+  await esbuild.build({
+    entryPoints: [path.join(ROOT, "background.js")],
+    bundle: true,
+    outfile: path.join(DIST, "background.js"),
+    platform: "browser",
+    format: "esm",
+    target: ["chrome120"],
+    minify: true,
+    sourcemap: false
+  });
+
+  await esbuild.build({
+    entryPoints: [path.join(ROOT, "fb-saver-content.js")],
+    bundle: true,
+    outfile: path.join(DIST, "fb-saver-content.js"),
     platform: "browser",
     format: "iife",
     target: ["chrome120"],
