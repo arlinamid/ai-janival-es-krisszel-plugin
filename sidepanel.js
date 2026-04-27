@@ -1,7 +1,57 @@
 /* global LanguageModel */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import * as LucideIcons from "lucide-react";
+import {
+  Bookmark,
+  BookmarkCheck,
+  BrainCircuit,
+  Calendar,
+  CalendarClock,
+  ChevronRight,
+  Copy,
+  Download,
+  ExternalLink,
+  FileText,
+  FolderPlus,
+  History,
+  LogIn,
+  MessageSquareText,
+  Plus,
+  RefreshCw,
+  Search,
+  SendHorizontal,
+  SlidersHorizontal,
+  Square,
+  Trash2,
+  TriangleAlert,
+  X
+} from "lucide-react";
+
+const ICON_MAP = {
+  Bookmark,
+  BookmarkCheck,
+  BrainCircuit,
+  Calendar,
+  CalendarClock,
+  ChevronRight,
+  Copy,
+  Download,
+  ExternalLink,
+  FileText,
+  FolderPlus,
+  History,
+  LogIn,
+  MessageSquareText,
+  Plus,
+  RefreshCw,
+  Search,
+  SendHorizontal,
+  SlidersHorizontal,
+  Square,
+  Trash2,
+  TriangleAlert,
+  X
+};
 import { marked } from "marked";
 
 const SUPPORTED_TEXT_LANGUAGES = ["en", "es", "ja"];
@@ -121,7 +171,7 @@ const HUNGARIAN_SUFFIXES = [
 ];
 
 function Icon({ name, size = 18, strokeWidth = 2, className = "" }) {
-  const LucideIcon = LucideIcons[name];
+  const LucideIcon = ICON_MAP[name];
 
   if (!LucideIcon) {
     return null;
