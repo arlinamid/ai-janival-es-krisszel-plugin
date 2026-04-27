@@ -7,6 +7,7 @@ import {
   BrainCircuit,
   Calendar,
   CalendarClock,
+  Check,
   ChevronRight,
   Copy,
   Download,
@@ -34,6 +35,7 @@ const ICON_MAP = {
   BrainCircuit,
   Calendar,
   CalendarClock,
+  Check,
   ChevronRight,
   Copy,
   Download,
@@ -3271,6 +3273,93 @@ function Composer({
   );
 }
 
+const CHROME_SETUP_LINKS = [
+  {
+    id: "flag-model",
+    label: "On-device modell engedélyezése",
+    url: "chrome://flags/#optimization-guide-on-device-model",
+    hint: 'Enabled',
+    step: "1"
+  },
+  {
+    id: "flag-prompt",
+    label: "Prompt API engedélyezése",
+    url: "chrome://flags/#prompt-api-for-gemini-nano",
+    hint: 'Enabled',
+    step: "2"
+  },
+  {
+    id: "components",
+    label: "Modell letöltés / frissítés",
+    url: "chrome://components/",
+    hint: "Optimization Guide On Device Model → Check for update",
+    step: "3"
+  },
+  {
+    id: "internals",
+    label: "AI belső állapot (debug)",
+    url: "chrome://on-device-internals",
+    hint: null,
+    step: "4"
+  }
+];
+
+function SettingsQuickLinks() {
+  const [copied, setCopied] = useState(null);
+
+  function handleCopy(id, url) {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(id);
+      setTimeout(() => setCopied(null), 2000);
+    }).catch(() => {});
+  }
+
+  return React.createElement(
+    "section",
+    { className: "settings-links" },
+    React.createElement(
+      "div",
+      { className: "settings-links-header" },
+      React.createElement(Icon, { name: "ExternalLink", size: 13 }),
+      React.createElement("h3", null, "Chrome beállítások"),
+    ),
+    React.createElement(
+      "p",
+      { className: "settings-links-hint" },
+      "Masolj be a cimsorba (Ctrl+L), majd nyomd Enter."
+    ),
+    CHROME_SETUP_LINKS.map(({ id, label, url, hint, step }) =>
+      React.createElement(
+        "div",
+        { key: id, className: "settings-link-row" },
+        React.createElement("span", { className: "settings-link-step" }, step),
+        React.createElement(
+          "div",
+          { className: "settings-link-body" },
+          React.createElement("span", { className: "settings-link-label" }, label),
+          React.createElement("code", { className: "settings-link-url" }, url),
+          hint
+            ? React.createElement("span", { className: "settings-link-set" }, "Allitsd: ", React.createElement("strong", null, hint))
+            : null
+        ),
+        React.createElement(
+          "button",
+          {
+            type: "button",
+            className: `settings-link-copy ${copied === id ? "copied" : ""}`,
+            title: copied === id ? "Masolva!" : "Masolas a vagólapra",
+            onClick: () => handleCopy(id, url)
+          },
+          React.createElement(Icon, { name: copied === id ? "Check" : "Copy", size: 13 }),
+          copied === id
+            ? React.createElement("span", null, "Masolva")
+            : React.createElement("span", null, "Masolj")
+        )
+      )
+    )
+  );
+}
+
 function SettingsDrawer({
   open,
   onClose,
@@ -3317,6 +3406,7 @@ function SettingsDrawer({
       React.createElement(
         "div",
         { className: "drawer-content" },
+        React.createElement(SettingsQuickLinks, null),
         React.createElement(
           "label",
           { className: "field" },
