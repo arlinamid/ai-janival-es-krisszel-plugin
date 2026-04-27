@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.3] - 2026-04-27
+
+### Módosítva
+- Build pipeline átírva: a `vendor/` könyvtárból eltávolítva a kézileg kezelt React, ReactDOM, Lucide, Marked UMD fájlok és az `extension-shim.js`.
+- `sidepanel.js` mostantól proper ES module importokat használ (`react`, `react-dom/client`, `lucide-react`, `marked`).
+- esbuild bundler hozzáadva: `sidepanel.js` + összes függőség egyetlen minifikált IIFE bundle-be kerül buildkor.
+- `lucide-react` npm csomag váltotta fel a kézzel kezelt `lucide.min.js` vendor fájlt; az `Icon` komponens közvetlenül lucide-react komponenseket használ.
+- `marked` npm csomag váltotta fel a `marked.min.js` vendor fájlt; eltávolítva a `self.marked` global fallback.
+- `scripts/release.js` újraírva: esbuild JS API-t használ, csak `vendor/tailwind.css` kerül a dist-be a vendor JS fájlok helyett.
+- `sidepanel.html`: vendor JS `<script>` tagek eltávolítva, egyetlen bundled `sidepanel.js` marad.
+
+### Javítva
+- `React is not defined` hiba vélegesen megszüntetve: nincs több UMD global workaround, React standard npm csomagból bundlölve.
+
 ## [0.3.2] - 2026-04-27
 
 ### Javítva

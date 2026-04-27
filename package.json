@@ -2,17 +2,21 @@
   "name": "chrome-built-in-ai-extension",
   "private": true,
   "dependencies": {
-    "lucide": "^1.8.0",
+    "lucide-react": "^1.11.0",
+    "marked": "^18.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.4",
+    "esbuild": "^0.28.0",
     "tailwindcss": "^4.2.4"
   },
   "scripts": {
     "build:css": "node node_modules/@tailwindcss/cli/dist/index.mjs -i tailwind.input.css -o vendor/tailwind.css",
+    "build:js": "esbuild sidepanel.js --bundle --outfile=dist/sidepanel.js --platform=browser --format=iife --target=chrome120 --minify",
     "watch:css": "node node_modules/@tailwindcss/cli/dist/index.mjs -i tailwind.input.css -o vendor/tailwind.css --watch",
+    "build": "node scripts/release.js --dist-only",
     "build:release": "node scripts/release.js"
   }
 }

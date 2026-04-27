@@ -1,5 +1,8 @@
-/* global React, ReactDOM, lucide, LanguageModel */
-const { useCallback, useEffect, useMemo, useRef, useState } = React;
+/* global LanguageModel */
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
+import * as LucideIcons from "lucide-react";
+import { marked } from "marked";
 
 const SUPPORTED_TEXT_LANGUAGES = ["en", "es", "ja"];
 const KNOWLEDGE_FILES = ["database/posts-categorized.json"];
@@ -117,45 +120,18 @@ const HUNGARIAN_SUFFIXES = [
   "at"
 ];
 
-const iconAttrMap = {
-  class: "className",
-  "stroke-width": "strokeWidth",
-  "stroke-linecap": "strokeLinecap",
-  "stroke-linejoin": "strokeLinejoin"
-};
-
-function toReactAttrs(attrs) {
-  return Object.fromEntries(
-    Object.entries(attrs || {}).map(([key, value]) => [iconAttrMap[key] || key, value])
-  );
-}
-
 function Icon({ name, size = 18, strokeWidth = 2, className = "" }) {
-  const nodes = lucide?.icons?.[name];
+  const LucideIcon = LucideIcons[name];
 
-  if (!nodes) {
+  if (!LucideIcon) {
     return null;
   }
 
-  return React.createElement(
-    "svg",
-    {
-      className: `icon ${className}`.trim(),
-      xmlns: "http://www.w3.org/2000/svg",
-      width: size,
-      height: size,
-      viewBox: "0 0 24 24",
-      fill: "none",
-      stroke: "currentColor",
-      strokeWidth,
-      strokeLinecap: "round",
-      strokeLinejoin: "round",
-      "aria-hidden": "true"
-    },
-    nodes.map(([tag, attrs], index) =>
-      React.createElement(tag, { key: `${name}-${index}`, ...toReactAttrs(attrs) })
-    )
-  );
+  return React.createElement(LucideIcon, {
+    size,
+    strokeWidth,
+    className: `icon ${className}`.trim()
+  });
 }
 
 function buildLanguageOptions(outputLanguage) {
@@ -2922,9 +2898,7 @@ function ChatMessage({ message }) {
         ? React.createElement("div", {
             className: `message-content markdown ${message.state || ""}`,
             dangerouslySetInnerHTML: {
-              __html: self.marked
-                ? self.marked.parse(message.content, { breaks: true, gfm: true })
-                : message.content.replace(/\n/g, "<br>")
+              __html: marked.parse(message.content, { breaks: true, gfm: true })
             }
           })
         : React.createElement(
@@ -3342,4 +3316,4 @@ function RangeField({ label, min, max, step, value, onChange }) {
   );
 }
 
-ReactDOM.createRoot(document.querySelector("#root")).render(React.createElement(App));
+createRoot(document.querySelector("#root")).render(React.createElement(App));

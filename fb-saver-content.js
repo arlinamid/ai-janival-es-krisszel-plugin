@@ -183,6 +183,35 @@ function canonicalPostUrl(postId) {
   return `https://www.facebook.com/groups/${TARGET_GROUP_SLUG}/posts/${postId}/`;
 }
 
+function buildFallbackPermalink(container, mediaId) {
+  const groupMatch = location.pathname.match(/\/groups\/([^/]+)/);
+  const groupSegment = groupMatch ? groupMatch[1] : TARGET_GROUP_SLUG;
+
+  if (mediaId.startsWith("e_")) {
+    const externalLink = container.querySelector(
+      'a[href^="http"]:not([href*="facebook.com"]):not([href*="fb.me"]):not([href*="fb.com"])'
+    );
+
+    if (externalLink?.href) {
+      return externalLink.href;
+    }
+  }
+
+  if (mediaId.startsWith("s_")) {
+    const storyLink = container.querySelector('a[href*="/stories/"]');
+
+    if (storyLink?.href) {
+      return new URL(storyLink.href, location.origin).href;
+    }
+  }
+
+  if (/^\d+$/.test(mediaId)) {
+    return `https://www.facebook.com/groups/${groupSegment}/posts/${mediaId}/`;
+  }
+
+  return location.href.split("#")[0];
+}
+
 function isOnTargetGroupPage() {
   const path = location.pathname || "";
   return TARGET_GROUP_SLUGS.some(
@@ -396,6 +425,16 @@ function processArticles() {
   }
 
   const seen = new Set();
+  const linkSelectors = [
+    'a[href*="/permalink/"]',
+    'a[href*="/groups/"][href*="/posts/"]:not([href*="/user/"])',
+    'a[href*="set=gm."]',
+    'a[href*="set=pcb."]',
+    'a[href*="post_insights"]',
+    'a[href*="/reel/"]',
+    'a[href*="/videos/"]',
+    'a[href*="/stories/"]'
+  ].join(",");
 
   document.querySelectorAll('[aria-haspopup="menu"]').forEach((moreButton) => {
     if (moreButton.dataset.fbsProcessed === "1") {
@@ -403,40 +442,91 @@ function processArticles() {
     }
 
     const label = moreButton.getAttribute("aria-label") || "";
+    const lowerLabel = label.toLowerCase();
     const isPostActionButton =
       label.includes("bejegyzéssel kapcsolatos") ||
+      label.includes("bejegyzés") ||
       label.includes("Actions for this post") ||
-      label.includes("More");
+      lowerLabel.includes("post") ||
+      lowerLabel.includes("action");
 
     if (!isPostActionButton) {
       return;
     }
 
-    const container = findPostContainer(moreButton);
+    const postContainer = findPostContainer(moreButton);
 
-    if (!container) {
+    if (!postContainer) {
       return;
     }
 
-    const resolved = resolvePostFromContainer(container);
+    let postId = null;
+    let postUrl = null;
 
-    if (!resolved || seen.has(resolved.postId)) {
+    for (const link of postContainer.querySelectorAll(
+      'a[href*="/groups/"][href*="/posts/"]'
+    )) {
+      if (link.href.includes("/user/")) {
+        continue;
+      }
+
+      const match = link.getAttribute("href")?.match(/\/groups\/[^/]+\/posts\/(\d+)/);
+
+      if (match) {
+        postId = match[1];
+        postUrl = link.href;
+        break;
+      }
+    }
+
+    if (!postId) {
+      for (const link of postContainer.querySelectorAll(linkSelectors)) {
+        const id = extractPostId(link.href);
+
+        if (id) {
+          postId = id;
+          postUrl = link.href;
+          break;
+        }
+      }
+    }
+
+    if (!postId) {
+      const mediaId = extractPostIdFromMedia(postContainer);
+
+      if (!mediaId) {
+        return;
+      }
+
+      postId = mediaId;
+      postUrl = buildFallbackPermalink(postContainer, mediaId);
+    }
+
+    postUrl = canonicalPostUrl(postId) || postUrl;
+
+    if (!postId || seen.has(postId)) {
       return;
     }
 
-    seen.add(resolved.postId);
-    moreButton.dataset.fbsProcessed = "1";
+    seen.add(postId);
 
-    const star = createStarButton(resolved.postId, resolved.postUrl, container);
-    // A "..." gomb DOM-struktúrája: L0=moreButton, L1=wrapper, L2=moreBtnBox, L3=flexRow.
-    // L3-ba kell szúrni, különben a csillag a "..."-on belülre kerül és nem látszik.
+    if (document.querySelector(`.fbs-star-button[data-post-id="${postId}"]`)) {
+      moreButton.dataset.fbsProcessed = "1";
+      return;
+    }
+
+    const star = createStarButton(postId, postUrl, postContainer);
     const moreBtnBox = moreButton.parentElement?.parentElement;
     const flexRow = moreBtnBox?.parentElement;
+
     if (flexRow && moreBtnBox) {
       flexRow.insertBefore(star, moreBtnBox);
     } else {
       (moreButton.parentElement || moreButton).insertBefore(star, moreButton);
     }
+
+    moreButton.dataset.fbsProcessed = "1";
+    console.debug("[FBS] star inserted", postId, postUrl?.split("?")[0]);
   });
 
   refreshStarButtons();
