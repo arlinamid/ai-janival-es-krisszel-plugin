@@ -2053,14 +2053,6 @@ function App() {
           open: isSettingsOpen,
           onClose: () => setIsSettingsOpen(false),
           status,
-          streaming,
-          setStreaming: (value) => updateSettings(() => setStreaming(value)),
-          systemPrompt,
-          setSystemPrompt: (value) => updateSettings(() => setSystemPrompt(value)),
-          outputLanguage,
-          setOutputLanguage: (value) => updateSettings(() => setOutputLanguage(value)),
-          sampling,
-          setSampling: (value) => updateSettings(() => setSampling(value)),
           knowledgeSettings,
           setKnowledgeSettings: (value) =>
             updateSettings(() => setKnowledgeSettings(value)),
@@ -3412,20 +3404,13 @@ function SettingsDrawer({
   open,
   onClose,
   status,
-  streaming,
-  setStreaming,
-  systemPrompt,
-  setSystemPrompt,
-  outputLanguage,
-  setOutputLanguage,
-  sampling,
-  setSampling,
   knowledgeSettings,
   setKnowledgeSettings,
   knowledgeMeta,
   onRecheck,
   onClear
 }) {
+
   return React.createElement(
     React.Fragment,
     null,
@@ -3455,61 +3440,6 @@ function SettingsDrawer({
         "div",
         { className: "drawer-content" },
         React.createElement(SettingsQuickLinks, null),
-        React.createElement(
-          "div",
-          { className: "setting-group" },
-          React.createElement(
-            "label",
-            { className: "field" },
-            React.createElement("span", null, "System prompt"),
-            React.createElement("textarea", {
-              rows: 6,
-              value: systemPrompt,
-              onChange: (event) => setSystemPrompt(event.target.value)
-            })
-          ),
-          React.createElement(FieldHelp, {
-            text: "Utasitsd az AI-t milyen szerepben, stílusban es fokusszal valaszoljon. Peldaul: \"Legy tomor asszisztens. Valaszolj a felhasznalo nyelvén.\" Lehet magyar is.",
-            href: "https://developer.chrome.com/docs/extensions/ai/prompt-api#system_prompts",
-            linkText: "Prompt API doku"
-          })
-        ),
-        React.createElement(
-          "div",
-          { className: "setting-group" },
-          React.createElement(
-            "label",
-            { className: "field" },
-            React.createElement("span", null, "Output language"),
-            React.createElement(
-              "select",
-              {
-                value: outputLanguage,
-                onChange: (event) => setOutputLanguage(event.target.value)
-              },
-              React.createElement("option", { value: "en" }, "English (en)"),
-              React.createElement("option", { value: "es" }, "Spanish (es)"),
-              React.createElement("option", { value: "ja" }, "Japanese (ja)")
-            )
-          ),
-          React.createElement(FieldHelp, {
-            text: "A Gemini Nano jelenleg csak angol, spanyol es japan kimenetet tamogat. Magyarul kerdezhetsz, de a valasz ezen a nyelven erkezik.",
-            href: "https://developer.chrome.com/docs/ai/get-started#language_support",
-            linkText: "Tamogatott nyelvek"
-          })
-        ),
-        React.createElement(
-          "div",
-          { className: "setting-group" },
-          React.createElement(ToggleField, {
-            label: "Streaming response",
-            checked: streaming,
-            onChange: setStreaming
-          }),
-          React.createElement(FieldHelp, {
-            text: "A valasz generalas kozben jelenik meg, nem kell megvarni a teljes szoveget. Ha hibat latsz, probald kikapcsolni."
-          })
-        ),
         React.createElement(
           "section",
           { className: "knowledge-panel" },
@@ -3581,38 +3511,6 @@ function SettingsDrawer({
             text: "Hany releváns forrás-reszletet adjon kontextuskent az AI-nak. Tobb forrás = pontosabb valasz, de lassabb es tobb tokent fogyaszt."
           })
         ),
-        sampling.available
-          ? React.createElement(
-              "div",
-              { className: "setting-group" },
-              React.createElement(RangeField, {
-                label: "Temperature",
-                min: 0,
-                max: sampling.maxTemperature,
-                step: 0.1,
-                value: sampling.temperature,
-                onChange: (value) => setSampling({ ...sampling, temperature: value })
-              }),
-              React.createElement(FieldHelp, {
-                text: "A valasz kreativitasa/veletlen szeru sege. Alacsony (0.1-0.5) = pontosabb, kiszamithatobb. Magas (1.0+) = kreativabb, vartlanabb.",
-                href: "https://developer.chrome.com/docs/extensions/ai/prompt-api#parameters",
-                linkText: "Temperature doku"
-              }),
-              React.createElement(RangeField, {
-                label: "Top-K",
-                min: 1,
-                max: sampling.maxTopK,
-                step: 1,
-                value: sampling.topK,
-                onChange: (value) => setSampling({ ...sampling, topK: value })
-              }),
-              React.createElement(FieldHelp, {
-                text: "Hany tokent vegyen figyelembe a modell minden lepesenel. Alacsonyabb = fokuszaltabb, magasabb = változatosabb szókincs.",
-                href: "https://developer.chrome.com/docs/extensions/ai/prompt-api#parameters",
-                linkText: "Top-K doku"
-              })
-            )
-          : null,
         React.createElement(
           "div",
           { className: "drawer-actions" },

@@ -2159,3 +2159,140 @@ h1 {
 .field-help-link:hover {
   color: var(--accent-strong);
 }
+
+/* ── Settings Lock ────────────────────────────────────────── */
+.settings-locked-zone {
+  transition: opacity 0.2s, filter 0.2s;
+}
+
+.settings-locked-zone.is-locked {
+  opacity: 0.38;
+  pointer-events: none;
+  filter: grayscale(0.4);
+  user-select: none;
+}
+
+.settings-lock-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.settings-lock-bar > svg {
+  flex-shrink: 0;
+}
+
+.settings-lock-bar > span {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.settings-lock-bar.locked {
+  border-color: #f0c040;
+  background: #fffbea;
+}
+
+@media (prefers-color-scheme: dark) {
+  .settings-lock-bar.locked {
+    background: #1e1800;
+    border-color: #6b5500;
+  }
+}
+
+.settings-lock-bar.unlocked {
+  border-color: #a5d6a7;
+  background: #f1f8f1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .settings-lock-bar.unlocked {
+    background: #0d1f10;
+    border-color: #2e6b38;
+  }
+}
+
+.lock-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.lock-form input[type="password"] {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.lock-form input[type="password"]:focus {
+  border-color: var(--accent);
+}
+
+.lock-form-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.lock-submit-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lock-submit-btn:hover:not(:disabled) { background: var(--accent-strong); }
+.lock-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.lock-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.lock-action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lock-action-btn.danger:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.lock-error {
+  font-size: 11.5px;
+  color: var(--danger);
+  margin: 0;
+}
