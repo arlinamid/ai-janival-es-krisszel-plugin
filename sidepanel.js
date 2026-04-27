@@ -2169,17 +2169,20 @@ const FOUNDERS = [
   {
     name: "Kőhalmi Krisztián",
     role: "Alapító · Krisz",
-    short: "Hetenként ingyenes AI-előadásokat tart, éles szemmel kommentálja az OpenAI, Anthropic és Meta bejelentéseit, és megtanít promptolni, gondolkodni — és néha kódot írni is. A plugin társszerzője."
+    short: "Média és kreatív szakember, aki az AI-t valódi alkotói eszközként használja. Janival együtt vezeti a heti közös előadásokat, éles szemmel kommentálja az iparági bejelentéseket, és a plugin társszerzője.",
+    substack: null
   },
   {
     name: "Rózsavölgyi János",
     role: "Alapító · Jani",
-    short: "Az agentic workflow-k és kreatív AI-alkalmazások kísérletezője: verseket fordít, zenét generál, MCP-pipeline-okat épít. VibeCoding-sessionök szervezője, és a plugin másik alkotója."
+    short: "Pragmatikus AI-műhely: esettanulmányok, prompt-technikák és valódi projektek — ahol az AI nem ígéret, hanem eszköz. Krisztiánnal közösen tartja a heti előadásokat, és a plugin másik alkotója.",
+    substack: "https://substack.com/@arlinamid"
   },
   {
     name: "Katschthaler Gabi",
     role: "Közreműködő",
-    short: "Mélyen gondolkodik az AI és az emberi augmentáció kapcsolatáról — Substack-cikkekben, filozofikus csoportposztokban és olyan kérdésekben, amiket mások nem mernek feltenni."
+    short: "Human Systems Architect: mozgást, öregedést és kogniciót vizsgál — és azt, hogyan terjeszthető ki az emberi képesség AI-val mint intelligens állványzattal. Substack-je: Intuitive Trouble, Engineered Change.",
+    substack: "https://substack.com/@intuitivetrouble"
   }
 ];
 
@@ -2362,7 +2365,15 @@ function FoundersSection() {
           ),
           React.createElement("div", { className: "founder-name" }, f.name),
           React.createElement("div", { className: "founder-role" }, f.role),
-          React.createElement("p", { className: "founder-bio" }, f.short)
+          React.createElement("p", { className: "founder-bio" }, f.short),
+          f.substack
+            ? React.createElement(
+                "a",
+                { className: "founder-substack", href: f.substack, target: "_blank", rel: "noopener noreferrer" },
+                React.createElement(Icon, { name: "ExternalLink", size: 12 }),
+                " Substack"
+              )
+            : null
         )
       )
     )

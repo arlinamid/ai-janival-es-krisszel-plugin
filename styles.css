@@ -1547,7 +1547,21 @@ h1 {
   font-size: 10px;
   color: #6b6b6b;
   line-height: 1.4;
-  margin: 0;
+  margin: 0 0 4px;
+}
+
+.founder-substack {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--t-red);
+  text-decoration: none;
+  letter-spacing: 0.3px;
+}
+.founder-substack:hover {
+  text-decoration: underline;
 }
 
 /* ── Trending ────────────────────────────────────────────────── */
