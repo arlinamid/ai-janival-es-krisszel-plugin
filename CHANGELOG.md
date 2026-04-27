@@ -2,6 +2,9 @@
 
 ## [0.3.3] - 2026-04-27
 
+### Hozzáadva
+- `AiTermsScreen`: Gemini Nano feltételek és figyelmeztetések képernyő a Chat fülön, az első használat előtt kötelező elfogadni. Tartalmazza a hardver-követelményeket, az aktiválási lépéseket, adatvédelmi tájékoztatót és a személyes használatra vonatkozó figyelmeztetést. Elfogadás után `localStorage`-ban megjegyzi (nem kérdezi újra).
+
 ### Módosítva
 - Build pipeline átírva: a `vendor/` könyvtárból eltávolítva a kézileg kezelt React, ReactDOM, Lucide, Marked UMD fájlok és az `extension-shim.js`.
 - `sidepanel.js` mostantól proper ES module importokat használ (`react`, `react-dom/client`, `lucide-react`, `marked`).

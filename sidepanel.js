@@ -20,6 +20,7 @@ import {
   RefreshCw,
   Search,
   SendHorizontal,
+  Shield,
   SlidersHorizontal,
   Square,
   Trash2,
@@ -46,6 +47,7 @@ const ICON_MAP = {
   RefreshCw,
   Search,
   SendHorizontal,
+  Shield,
   SlidersHorizontal,
   Square,
   Trash2,
@@ -1377,6 +1379,112 @@ function retrieveKnowledgeSources(index, prompt, history, limit) {
   return { sources: fallback, steps };
 }
 
+const AI_TERMS_KEY = "ai-terms-accepted-v1";
+
+function AiTermsScreen({ onAccept }) {
+  const rows = [
+    { label: "Böngésző", value: "Chrome 138 vagy újabb (asztali)" },
+    { label: "OS", value: "Windows 10/11 · macOS 13+ · Linux · ChromeOS (Chromebook Plus)" },
+    { label: "Tárhely", value: "Legalább 22 GB szabad hely a Chrome-profil kötetén" },
+    { label: "GPU", value: "> 4 GB VRAM" },
+    { label: "vagy CPU", value: "16 GB RAM + minimum 4 processzormag" },
+    { label: "Internet", value: "Korlátlan kapcsolat az első letöltéshez (~2–4 GB modell)" },
+    { label: "Nyelvek", value: "Csak angol (en), spanyol (es) és japán (ja) támogatott" }
+  ];
+
+  const flags = [
+    "chrome://flags/#optimization-guide-on-device-model → Enabled",
+    "chrome://flags/#prompt-api-for-gemini-nano → Enabled"
+  ];
+
+  return React.createElement(
+    "div",
+    { className: "ai-terms-screen" },
+    React.createElement(
+      "div",
+      { className: "ai-terms-hero" },
+      React.createElement(
+        "div",
+        { className: "ai-terms-hero-icon" },
+        React.createElement(Icon, { name: "BrainCircuit", size: 20 })
+      ),
+      React.createElement(
+        "div",
+        null,
+        React.createElement("h2", null, "Gemini Nano — beépített AI"),
+        React.createElement("p", null, "Olvasd el a feltételeket, mielőtt elkezded használni")
+      )
+    ),
+    React.createElement(
+      "div",
+      { className: "ai-terms-section" },
+      React.createElement("p", { className: "ai-terms-section-title" }, "Hardver követelmények"),
+      rows.map(({ label, value }) =>
+        React.createElement(
+          "div",
+          { key: label, className: "ai-terms-row" },
+          React.createElement("span", { className: "ai-terms-row-label" }, label),
+          React.createElement("span", null, value)
+        )
+      )
+    ),
+    React.createElement(
+      "div",
+      { className: "ai-terms-section" },
+      React.createElement("p", { className: "ai-terms-section-title" }, "Aktiválás (első alkalommal)"),
+      flags.map((f) =>
+        React.createElement("div", { key: f, className: "ai-terms-row" },
+          React.createElement("code", { className: "ai-terms-flags" }, f)
+        )
+      ),
+      React.createElement(
+        "div",
+        { className: "ai-terms-row" },
+        React.createElement(
+          "span",
+          null,
+          "Majd Chrome újraindítás, nyisd meg: ",
+          React.createElement("code", { className: "ai-terms-flags" }, "chrome://components/"),
+          " — keresd az \"Optimization Guide On Device Model\" elemet, kattints a Check for update gombra."
+        )
+      )
+    ),
+    React.createElement(
+      "div",
+      { className: "ai-terms-privacy-box" },
+      React.createElement(Icon, { name: "Shield", size: 16, className: "ai-terms-box-icon" }),
+      React.createElement(
+        "p",
+        null,
+        React.createElement("strong", null, "Teljes adatvédelem: "),
+        "A Gemini Nano modell lokálisan fut a te gépen. Semmi adat nem kerül Google-höz vagy harmadik félhez. Internet-kapcsolat csak az első (~2–4 GB-os) letöltéshez kell — utána offline is működik."
+      )
+    ),
+    React.createElement(
+      "div",
+      { className: "ai-terms-warn-box" },
+      React.createElement(Icon, { name: "TriangleAlert", size: 16, className: "ai-terms-box-icon" }),
+      React.createElement(
+        "p",
+        null,
+        React.createElement("strong", null, "Csak személyes használatra. "),
+        "Ez a plugin kizárólag magáncélra készült. A Chrome beépített AI API-ra vonatkozik a ",
+        React.createElement(
+          "a",
+          { href: "https://policies.google.com/terms/generative-ai/use-policy", target: "_blank", rel: "noreferrer" },
+          "Google Generative AI Prohibited Uses Policy"
+        ),
+        ". Tilos mások számára szolgáltatásként kínálni, automatizált döntéshozatalra vagy félrevezető tartalom előállítására használni."
+      )
+    ),
+    React.createElement(
+      "button",
+      { className: "ai-terms-accept-btn", type: "button", onClick: onAccept },
+      "Megértettem és elfogadom — Chat megnyitása"
+    )
+  );
+}
+
 function App() {
   const [activeTab, setActiveTab] = useState("home");
   const [messages, setMessages] = useState([]);
@@ -1421,6 +1529,9 @@ function App() {
     event: null,
     error: ""
   });
+  const [aiTermsAccepted, setAiTermsAccepted] = useState(
+    () => localStorage.getItem(AI_TERMS_KEY) === "1"
+  );
 
   const sessionRef = useRef(null);
   const abortRef = useRef(null);
@@ -1880,7 +1991,15 @@ function App() {
     activeTab === "tools"
       ? React.createElement(PluginToolsPage, { nextEvent })
       : null,
-    activeTab === "chat"
+    activeTab === "chat" && !aiTermsAccepted
+      ? React.createElement(AiTermsScreen, {
+          onAccept: () => {
+            localStorage.setItem(AI_TERMS_KEY, "1");
+            setAiTermsAccepted(true);
+          }
+        })
+      : null,
+    activeTab === "chat" && aiTermsAccepted
       ? React.createElement(
           React.Fragment,
           null,
