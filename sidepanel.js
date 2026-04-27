@@ -21,6 +21,7 @@ import {
   LogIn,
   MessageSquareText,
   Plus,
+  Radio,
   RefreshCw,
   Search,
   SendHorizontal,
@@ -52,6 +53,7 @@ const ICON_MAP = {
   LogIn,
   MessageSquareText,
   Plus,
+  Radio,
   RefreshCw,
   Search,
   SendHorizontal,
@@ -2016,12 +2018,13 @@ function App() {
           React.createElement("span", null, notice)
         )
       : null,
+    React.createElement(EventBanner, { nextEvent, compact: true }),
     React.createElement(TabBar, { activeTab, onTabChange: setActiveTab }),
     activeTab === "home"
       ? React.createElement(HomePage, { latestPosts, nextEvent, knowledgeRef })
       : null,
     activeTab === "tools"
-      ? React.createElement(PluginToolsPage, { nextEvent })
+      ? React.createElement(PluginToolsPage, null)
       : null,
     activeTab === "chat" && !aiTermsAccepted
       ? React.createElement(AiTermsScreen, {
@@ -2561,7 +2564,7 @@ function HomePage({ latestPosts, nextEvent, knowledgeRef }) {
   );
 }
 
-function PluginToolsPage({ nextEvent }) {
+function PluginToolsPage() {
   const [posts, setPosts] = useState([]);
   const [cats, setCats] = useState([]);
   const [query, setQuery] = useState("");
@@ -2685,7 +2688,6 @@ function PluginToolsPage({ nextEvent }) {
   return React.createElement(
     "section",
     { className: "tab-page tools-page" },
-    React.createElement(EventBanner, { nextEvent, compact: true }),
     React.createElement(
       "div",
       { className: "section-heading" },
