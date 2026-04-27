@@ -9,12 +9,15 @@ import {
   CalendarClock,
   Check,
   ChevronRight,
+  CircleAlert,
   Copy,
+  Database,
   Download,
   ExternalLink,
   FileText,
   FolderPlus,
   History,
+  Info,
   LogIn,
   MessageSquareText,
   Plus,
@@ -37,12 +40,15 @@ const ICON_MAP = {
   CalendarClock,
   Check,
   ChevronRight,
+  CircleAlert,
   Copy,
+  Database,
   Download,
   ExternalLink,
   FileText,
   FolderPlus,
   History,
+  Info,
   LogIn,
   MessageSquareText,
   Plus,
@@ -3273,6 +3279,24 @@ function Composer({
   );
 }
 
+function FieldHelp({ text, href, linkText }) {
+  return React.createElement(
+    "p",
+    { className: "field-help" },
+    React.createElement(Icon, { name: "Info", size: 11 }),
+    React.createElement("span", null,
+      text,
+      href
+        ? React.createElement(
+            "a",
+            { href, target: "_blank", rel: "noreferrer", className: "field-help-link" },
+            " ", linkText || "Dokumentacio"
+          )
+        : null
+    )
+  );
+}
+
 const CHROME_SETUP_LINKS = [
   {
     id: "flag-model",
@@ -3408,35 +3432,60 @@ function SettingsDrawer({
         { className: "drawer-content" },
         React.createElement(SettingsQuickLinks, null),
         React.createElement(
-          "label",
-          { className: "field" },
-          React.createElement("span", null, "System prompt"),
-          React.createElement("textarea", {
-            rows: 6,
-            value: systemPrompt,
-            onChange: (event) => setSystemPrompt(event.target.value)
+          "div",
+          { className: "setting-group" },
+          React.createElement(
+            "label",
+            { className: "field" },
+            React.createElement("span", null, "System prompt"),
+            React.createElement("textarea", {
+              rows: 6,
+              value: systemPrompt,
+              onChange: (event) => setSystemPrompt(event.target.value)
+            })
+          ),
+          React.createElement(FieldHelp, {
+            text: "Utasitsd az AI-t milyen szerepben, stílusban es fokusszal valaszoljon. Peldaul: \"Legy tomor asszisztens. Valaszolj a felhasznalo nyelvén.\" Lehet magyar is.",
+            href: "https://developer.chrome.com/docs/extensions/ai/prompt-api#system_prompts",
+            linkText: "Prompt API doku"
           })
         ),
         React.createElement(
-          "label",
-          { className: "field" },
-          React.createElement("span", null, "Output language"),
+          "div",
+          { className: "setting-group" },
           React.createElement(
-            "select",
-            {
-              value: outputLanguage,
-              onChange: (event) => setOutputLanguage(event.target.value)
-            },
-            React.createElement("option", { value: "en" }, "English"),
-            React.createElement("option", { value: "es" }, "Spanish"),
-            React.createElement("option", { value: "ja" }, "Japanese")
-          )
+            "label",
+            { className: "field" },
+            React.createElement("span", null, "Output language"),
+            React.createElement(
+              "select",
+              {
+                value: outputLanguage,
+                onChange: (event) => setOutputLanguage(event.target.value)
+              },
+              React.createElement("option", { value: "en" }, "English (en)"),
+              React.createElement("option", { value: "es" }, "Spanish (es)"),
+              React.createElement("option", { value: "ja" }, "Japanese (ja)")
+            )
+          ),
+          React.createElement(FieldHelp, {
+            text: "A Gemini Nano jelenleg csak angol, spanyol es japan kimenetet tamogat. Magyarul kerdezhetsz, de a valasz ezen a nyelven erkezik.",
+            href: "https://developer.chrome.com/docs/ai/get-started#language_support",
+            linkText: "Tamogatott nyelvek"
+          })
         ),
-        React.createElement(ToggleField, {
-          label: "Streaming response",
-          checked: streaming,
-          onChange: setStreaming
-        }),
+        React.createElement(
+          "div",
+          { className: "setting-group" },
+          React.createElement(ToggleField, {
+            label: "Streaming response",
+            checked: streaming,
+            onChange: setStreaming
+          }),
+          React.createElement(FieldHelp, {
+            text: "A valasz generalas kozben jelenik meg, nem kell megvarni a teljes szoveget. Ha hibat latsz, probald kikapcsolni."
+          })
+        ),
         React.createElement(
           "section",
           { className: "knowledge-panel" },
@@ -3453,8 +3502,8 @@ function SettingsDrawer({
                 knowledgeMeta.status === "ready"
                   ? `${knowledgeMeta.documents} records, ${knowledgeMeta.chunks} chunks`
                   : knowledgeMeta.status === "loading"
-                    ? "Indexelés..."
-                    : knowledgeMeta.error || "Nem sikerült betölteni."
+                    ? "Indexeles..."
+                    : knowledgeMeta.error || "Nem sikerult betolteni."
               )
             ),
             React.createElement(Icon, {
@@ -3481,11 +3530,19 @@ function SettingsDrawer({
             onChange: (checked) =>
               setKnowledgeSettings({ ...knowledgeSettings, enabled: checked })
           }),
+          React.createElement(FieldHelp, {
+            text: "BM25 kereses: a plugin a csoportos posztok kozul keres releváns kontextust es beilleszti az AI keresehez (RAG). Kapcsold ki ha az AI csak sajat tudásat használja.",
+            href: "https://en.wikipedia.org/wiki/Okapi_BM25",
+            linkText: "Mi az a BM25?"
+          }),
           React.createElement(ToggleField, {
             label: "Thinking mode simulation",
             checked: knowledgeSettings.thinkingMode,
             onChange: (checked) =>
               setKnowledgeSettings({ ...knowledgeSettings, thinkingMode: checked })
+          }),
+          React.createElement(FieldHelp, {
+            text: "System prompt kiegeszito, ami lepesenkenti gondolkodasra osztonzi a modellt. Hosszabb de pontosabb valaszokat eredmenyezhet komplex kerdeseknel."
           }),
           React.createElement(RangeField, {
             label: "Retrieved sources",
@@ -3495,6 +3552,9 @@ function SettingsDrawer({
             value: knowledgeSettings.topK,
             onChange: (value) =>
               setKnowledgeSettings({ ...knowledgeSettings, topK: value })
+          }),
+          React.createElement(FieldHelp, {
+            text: "Hany releváns forrás-reszletet adjon kontextuskent az AI-nak. Tobb forrás = pontosabb valasz, de lassabb es tobb tokent fogyaszt."
           })
         ),
         sampling.available
@@ -3509,6 +3569,11 @@ function SettingsDrawer({
                 value: sampling.temperature,
                 onChange: (value) => setSampling({ ...sampling, temperature: value })
               }),
+              React.createElement(FieldHelp, {
+                text: "A valasz kreativitasa/veletlen szeru sege. Alacsony (0.1-0.5) = pontosabb, kiszamithatobb. Magas (1.0+) = kreativabb, vartlanabb.",
+                href: "https://developer.chrome.com/docs/extensions/ai/prompt-api#parameters",
+                linkText: "Temperature doku"
+              }),
               React.createElement(RangeField, {
                 label: "Top-K",
                 min: 1,
@@ -3516,6 +3581,11 @@ function SettingsDrawer({
                 step: 1,
                 value: sampling.topK,
                 onChange: (value) => setSampling({ ...sampling, topK: value })
+              }),
+              React.createElement(FieldHelp, {
+                text: "Hany tokent vegyen figyelembe a modell minden lepesenel. Alacsonyabb = fokuszaltabb, magasabb = változatosabb szókincs.",
+                href: "https://developer.chrome.com/docs/extensions/ai/prompt-api#parameters",
+                linkText: "Top-K doku"
               })
             )
           : null,
