@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.1] - 2026-04-27
+
+### Javítva
+- `React is not defined` hiba Vivaldi és más Chromium alapú böngészőkben: a `vendor/extension-shim.js` lefuttatja a `var module = void 0; var exports = void 0;` sorokat a React UMD betöltése előtt, ezzel kikényszeríti a globális path-t.
+- `createDocuments()` mostantól megőrzi a `category`, `subcategory`, `images`, `scrapedAt` mezőket a BM25 indexben (keresési találatoknál is jelenik meg alkategória és helyes kategória).
+- `recordTimestamp()`: `scrapedAt` eltávolítva, csak `postDate` alapján rendez — a tömeges scrape egyforma `scrapedAt` értékei nem befolyásolják a sorrendet.
+- Scramble-szűrő: 25+ karakteres hash-tokenek kiszűrése a szövegből, értelmetlen cím helyett "Cím nélkül" fallback.
+- Poszt sorrend: aktuális dátumtól visszafelé, dátum nélküli posztok a végén.
+
 ## [0.3.0] - 2026-04-27
 
 ### Hozzáadva
