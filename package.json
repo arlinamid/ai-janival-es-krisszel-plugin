@@ -1,0 +1,17 @@
+{
+  "name": "chrome-built-in-ai-extension",
+  "private": true,
+  "dependencies": {
+    "lucide": "^1.8.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.4",
+    "tailwindcss": "^4.2.4"
+  },
+  "scripts": {
+    "build:css": "node node_modules/@tailwindcss/cli/dist/index.mjs -i tailwind.input.css -o vendor/tailwind.css",
+    "watch:css": "node node_modules/@tailwindcss/cli/dist/index.mjs -i tailwind.input.css -o vendor/tailwind.css --watch"
+  }
+}

@@ -1,0 +1,35 @@
+# Changelog
+
+## [0.3.0] - 2026-04-27
+
+### Hozzáadva
+- Tabloid stílusú landing page: Hero carousel, Alapítók szekció, Trending lista, kategória-szűrős poszt feed.
+- Tabloid kategóriák a `posts-categorized.json` beépített `category` mezőjéből: Hírek, Eszköz, Alkotás, Oktatás, Kérdés, Vita, Egyéb.
+- Alkategória badge (16 féle: Előadás, Workflow, Prompt, Tool bemutató stb.) minden poszthoz.
+- BM25 keresés az összes poszt között a landing oldalon (kb. 617 rekord).
+- Magyar dátumformátum parser (`"2026. április 27., hétfő, 16:29"` → formázott idő).
+- LIVE esemény ticker és toolbar badge: 5 percenként ellenőrzi a schedule.json-t; Szerda 3h / Vasárnap 8h esemény-időtartam.
+- IndexedDB chat session mentés és history drawer.
+- Markdown renderelés AI válaszokban (`marked.js` v4).
+- Inline kategória-kezelés (nincs `window.prompt` / `alert`).
+- Tailwind CSS v4 build pipeline (`@tailwindcss/cli`).
+- Google Fonts: Playfair Display + Inter.
+- Scramble-szűrő: hash-szerű tokenek eltávolítása a szövegből, "Cím nélkül" fallback.
+
+### Módosítva
+- Adatforrás: `database/posts.json` → `database/posts-categorized.json`.
+- `categorizeRecord()`: regex alapú kategorizálás helyett közvetlen `category` mező olvasás.
+- `recordTimestamp()`: `postDate` az elsődleges forrás, `scrapedAt` nem használt.
+- Poszt sorrend: `postDate` szerint csökkenő, dátum nélküli posztok a végén.
+- `createDocuments()`: `category`, `subcategory`, `images` mezők megőrzése a BM25 indexben.
+- Mentett posztok tab neve: "Mentett posztok".
+- Szerző neve jelenik meg az azonosító helyett a mentett posztoknál.
+- `loadLatestPosts()`: nincs 60-as limit, az összes poszt betöltődik.
+
+## [0.2.0] - korábbi verzió
+
+- Alap side panel: landing, mentett posztok, chat tab.
+- Facebook content script: csillag gomb, mentési dialóg.
+- Chrome beépített AI chat (LanguageModel Prompt API).
+- BM25 knowledge base a chat RAG-hoz.
+- Smart RAG: author detection, follow-up context.

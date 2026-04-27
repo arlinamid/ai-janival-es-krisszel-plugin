@@ -1,0 +1,119 @@
+.fbs-star-button {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-right: 4px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #b0b3b8;
+  cursor: pointer;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.fbs-star-button:hover {
+  background: rgb(255 255 255 / 10%);
+  color: #42b883;
+}
+
+.fbs-star-button.fbs-saved {
+  color: #42b883;
+}
+
+#fbs-open-sidepanel {
+  position: fixed;
+  z-index: 2147483646;
+  right: 18px;
+  top: 74px;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgb(66 184 131 / 45%);
+  border-radius: 50%;
+  background: #242526;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 30%);
+  cursor: pointer;
+  padding: 2px;
+}
+
+#fbs-open-sidepanel:hover {
+  border-color: #42b883;
+  transform: translateY(-1px);
+}
+
+#fbs-open-sidepanel img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#fbs-save-dialog {
+  position: fixed;
+  z-index: 2147483647;
+  display: grid;
+  gap: 10px;
+  width: min(320px, calc(100vw - 24px));
+  border: 1px solid #3a3b3c;
+  border-radius: 10px;
+  background: #242526;
+  box-shadow: 0 18px 48px rgb(0 0 0 / 40%);
+  color: #e4e6eb;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  padding: 12px;
+}
+
+#fbs-save-dialog label {
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+}
+
+#fbs-save-dialog label span {
+  color: #b0b3b8;
+}
+
+#fbs-save-dialog input,
+#fbs-save-dialog textarea,
+#fbs-save-dialog select {
+  width: 100%;
+  border: 1px solid #3a3b3c;
+  border-radius: 8px;
+  background: #18191a;
+  color: #e4e6eb;
+  font: inherit;
+  padding: 8px 9px;
+}
+
+#fbs-save-dialog textarea {
+  resize: vertical;
+}
+
+.fbs-save-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.fbs-save-actions button {
+  min-height: 34px;
+  border: 1px solid #3a3b3c;
+  border-radius: 8px;
+  background: #303234;
+  color: #e4e6eb;
+  cursor: pointer;
+}
+
+.fbs-save-actions button:last-child {
+  border-color: #42b883;
+  background: #2d6f58;
+  color: white;
+}
