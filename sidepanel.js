@@ -2166,12 +2166,49 @@ function EventBanner({ nextEvent, compact = false }) {
 
 // ─── Tabloid constants ────────────────────────────────────────────────────────
 const FOUNDERS = [
-  { name: "Kőhalmi Krisztián", role: "Alapító · Krisz", substack: null },
-  { name: "Rózsavölgyi János",  role: "Alapító · Jani",  substack: "https://substack.com/@arlinamid" },
-  { name: "Katschthaler Gabi",  role: "Közreműködő",     substack: "https://substack.com/@intuitivetrouble" }
+  { name: "Kőhalmi Krisztián", role: "Alapító · Krisz", fbid: "10233129824339482", substack: null },
+  { name: "Rózsavölgyi János",  role: "Alapító · Jani",  fbid: "10231625443646757", substack: "https://substack.com/@arlinamid" },
+  { name: "Katschthaler Gabi",  role: "Közreműködő",     fbid: "10226477757530184", substack: "https://substack.com/@intuitivetrouble" }
 ];
 
 const DISCORD_URL = "https://discord.gg/kP6E9a8Sat";
+
+const PHOTO_CACHE_KEY = "founderPhotoCache";
+
+function loadPhotoCache() {
+  try { return JSON.parse(localStorage.getItem(PHOTO_CACHE_KEY) || "{}"); }
+  catch { return {}; }
+}
+function savePhotoCache(cache) {
+  try { localStorage.setItem(PHOTO_CACHE_KEY, JSON.stringify(cache)); } catch {}
+}
+
+async function resolveFounderPhoto(fbid) {
+  const cache = loadPhotoCache();
+  if (cache[fbid]) return cache[fbid];
+  try {
+    const res = await fetch(`https://www.facebook.com/photo/?fbid=${fbid}`, { credentials: "include" });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const match = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/);
+    if (!match) return null;
+    const url = match[1].replace(/&amp;/g, "&");
+    cache[fbid] = url;
+    savePhotoCache(cache);
+    return url;
+  } catch {
+    return null;
+  }
+}
+
+function useFounderPhoto(fbid) {
+  const [url, setUrl] = useState(() => loadPhotoCache()[fbid] || null);
+  useEffect(() => {
+    if (url || !fbid) return;
+    resolveFounderPhoto(fbid).then(u => { if (u) setUrl(u); });
+  }, [fbid]);
+  return url;
+}
 
 const CATEGORY_COLORS = {
   "Hírek":    "#e3061b",
@@ -2347,28 +2384,38 @@ function FoundersSection() {
     React.createElement(
       "div",
       { className: "founders-row" },
-      FOUNDERS.map((f) =>
-        React.createElement(
-          "div",
-          { key: f.name, className: "founder-card" },
-          React.createElement(
-            "div",
-            { className: "founder-avatar", style: { background: nameColor(f.name) } },
-            nameInitials(f.name)
-          ),
-          React.createElement("div", { className: "founder-name" }, f.name),
-          React.createElement("div", { className: "founder-role" }, f.role),
-          f.substack
-            ? React.createElement(
-                "a",
-                { className: "founder-substack", href: f.substack, target: "_blank", rel: "noopener noreferrer" },
-                React.createElement(Icon, { name: "ExternalLink", size: 12 }),
-                " Substack"
-              )
-            : null
-        )
-      )
+      FOUNDERS.map((f) => React.createElement(FounderCard, { key: f.name, founder: f }))
     )
+  );
+}
+
+function FounderCard({ founder: f }) {
+  const photoUrl = useFounderPhoto(f.fbid);
+  return React.createElement(
+    "div",
+    { className: "founder-card" },
+    photoUrl
+      ? React.createElement("img", {
+          className: "founder-avatar founder-avatar--photo",
+          src: photoUrl,
+          alt: f.name,
+          loading: "lazy"
+        })
+      : React.createElement(
+          "div",
+          { className: "founder-avatar", style: { background: nameColor(f.name) } },
+          nameInitials(f.name)
+        ),
+    React.createElement("div", { className: "founder-name" }, f.name),
+    React.createElement("div", { className: "founder-role" }, f.role),
+    f.substack
+      ? React.createElement(
+          "a",
+          { className: "founder-substack", href: f.substack, target: "_blank", rel: "noopener noreferrer" },
+          React.createElement(Icon, { name: "ExternalLink", size: 12 }),
+          " Substack"
+        )
+      : null
   );
 }
 

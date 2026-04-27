@@ -1526,6 +1526,12 @@ h1 {
   color: #fff;
 }
 
+.founder-avatar--photo {
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
 .founder-name {
   font-family: var(--t-body);
   font-size: 11px;
