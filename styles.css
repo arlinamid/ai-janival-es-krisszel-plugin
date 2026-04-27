@@ -1543,13 +1543,6 @@ h1 {
   margin: 2px 0 4px;
 }
 
-.founder-bio {
-  font-size: 10px;
-  color: #6b6b6b;
-  line-height: 1.4;
-  margin: 0 0 4px;
-}
-
 .founder-substack {
   display: inline-flex;
   align-items: center;
@@ -1559,10 +1552,22 @@ h1 {
   color: var(--t-red);
   text-decoration: none;
   letter-spacing: 0.3px;
+  margin-top: 4px;
 }
-.founder-substack:hover {
-  text-decoration: underline;
+.founder-substack:hover { text-decoration: underline; }
+
+.founders-discord {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #5865f2;
+  text-decoration: none;
+  letter-spacing: 0.3px;
+  margin-left: auto;
 }
+.founders-discord:hover { text-decoration: underline; }
 
 /* ── Trending ────────────────────────────────────────────────── */
 .trending-list {

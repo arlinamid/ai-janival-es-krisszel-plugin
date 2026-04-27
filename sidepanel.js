@@ -2166,25 +2166,12 @@ function EventBanner({ nextEvent, compact = false }) {
 
 // ─── Tabloid constants ────────────────────────────────────────────────────────
 const FOUNDERS = [
-  {
-    name: "Kőhalmi Krisztián",
-    role: "Alapító · Krisz",
-    short: "Média és kreatív szakember, aki az AI-t valódi alkotói eszközként használja. Janival együtt vezeti a heti közös előadásokat, éles szemmel kommentálja az iparági bejelentéseket, és a plugin társszerzője.",
-    substack: null
-  },
-  {
-    name: "Rózsavölgyi János",
-    role: "Alapító · Jani",
-    short: "Pragmatikus AI-műhely: esettanulmányok, prompt-technikák és valódi projektek — ahol az AI nem ígéret, hanem eszköz. Krisztiánnal közösen tartja a heti előadásokat, és a plugin másik alkotója.",
-    substack: "https://substack.com/@arlinamid"
-  },
-  {
-    name: "Katschthaler Gabi",
-    role: "Közreműködő",
-    short: "Human Systems Architect: mozgást, öregedést és kogniciót vizsgál — és azt, hogyan terjeszthető ki az emberi képesség AI-val mint intelligens állványzattal. Substack-je: Intuitive Trouble, Engineered Change.",
-    substack: "https://substack.com/@intuitivetrouble"
-  }
+  { name: "Kőhalmi Krisztián", role: "Alapító · Krisz", substack: null },
+  { name: "Rózsavölgyi János",  role: "Alapító · Jani",  substack: "https://substack.com/@arlinamid" },
+  { name: "Katschthaler Gabi",  role: "Közreműködő",     substack: "https://substack.com/@intuitivetrouble" }
 ];
+
+const DISCORD_URL = "https://discord.gg/kP6E9a8Sat";
 
 const CATEGORY_COLORS = {
   "Hírek":    "#e3061b",
@@ -2349,7 +2336,13 @@ function FoundersSection() {
     React.createElement(
       "div",
       { className: "tabloid-section-header" },
-      React.createElement("span", null, "ALAPÍTÓK")
+      React.createElement("span", null, "ALAPÍTÓK"),
+      React.createElement(
+        "a",
+        { className: "founders-discord", href: DISCORD_URL, target: "_blank", rel: "noopener noreferrer" },
+        React.createElement(Icon, { name: "MessageSquareText", size: 12 }),
+        " Discord"
+      )
     ),
     React.createElement(
       "div",
@@ -2365,7 +2358,6 @@ function FoundersSection() {
           ),
           React.createElement("div", { className: "founder-name" }, f.name),
           React.createElement("div", { className: "founder-role" }, f.role),
-          React.createElement("p", { className: "founder-bio" }, f.short),
           f.substack
             ? React.createElement(
                 "a",
