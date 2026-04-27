@@ -2166,9 +2166,9 @@ function EventBanner({ nextEvent, compact = false }) {
 
 // ─── Tabloid constants ────────────────────────────────────────────────────────
 const FOUNDERS = [
-  { name: "Kőhalmi Krisztián", role: "Alapító · Krisz", photo: "profile-images/krisz.png", photoPos: "center 12%", substack: null },
-  { name: "Rózsavölgyi János",  role: "Alapító · Jani",  photo: "profile-images/jani.png",  photoPos: "center 38%", substack: "https://substack.com/@arlinamid" },
-  { name: "Katschthaler Gabi",  role: "Közreműködő",     photo: "profile-images/gabi.png",  photoPos: "center 42%", substack: "https://substack.com/@intuitivetrouble" }
+  { name: "Kőhalmi Krisztián", role: "Alapító · Krisz", photo: "profile-images/krisz.webp", photoPos: "center 12%", substack: null },
+  { name: "Rózsavölgyi János",  role: "Alapító · Jani",  photo: "profile-images/jani.webp",  photoPos: "center 38%", substack: "https://substack.com/@arlinamid" },
+  { name: "Katschthaler Gabi",  role: "Közreműködő",     photo: "profile-images/gabi.webp",  photoPos: "center 42%", substack: "https://substack.com/@intuitivetrouble" }
 ];
 
 const DISCORD_URL = "https://discord.gg/kP6E9a8Sat";
