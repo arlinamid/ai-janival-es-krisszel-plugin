@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.2] - 2026-04-27
+
+### Javítva
+- `React is not defined` hiba végleges javítása: a `vendor/react.production.min.js` és `vendor/react-dom.production.min.js` fájlok egy `(function(module,exports){...})(undefined,undefined)` IIFE-be vannak csomagolva, ami árnyékolja a Vivaldi által injektált `module`/`exports` globálisokat és kikényszeríti a browser-global UMD path-t.
+
 ## [0.3.1] - 2026-04-27
 
 ### Javítva
