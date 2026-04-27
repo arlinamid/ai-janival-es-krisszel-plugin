@@ -2166,9 +2166,21 @@ function EventBanner({ nextEvent, compact = false }) {
 
 // ─── Tabloid constants ────────────────────────────────────────────────────────
 const FOUNDERS = [
-  { name: "Rózsavölgyi János", role: "Alapító", short: "Közösségünk egyik szellemi atyja, az AI mozgalom elindítója." },
-  { name: "Kőhalmi Krisztián", role: "Alapító", short: "Az AI világ szenvedélyes kutatója és gyakorlati alkalmazója." },
-  { name: "Katschthaler Gabi", role: "Alapító", short: "A csoport kreatív hajtóereje és szervező lelke." }
+  {
+    name: "Kőhalmi Krisztián",
+    role: "Alapító · Krisz",
+    short: "Hetenként ingyenes AI-előadásokat tart, éles szemmel kommentálja az OpenAI, Anthropic és Meta bejelentéseit, és megtanít promptolni, gondolkodni — és néha kódot írni is. A plugin társszerzője."
+  },
+  {
+    name: "Rózsavölgyi János",
+    role: "Alapító · Jani",
+    short: "Az agentic workflow-k és kreatív AI-alkalmazások kísérletezője: verseket fordít, zenét generál, MCP-pipeline-okat épít. VibeCoding-sessionök szervezője, és a plugin másik alkotója."
+  },
+  {
+    name: "Katschthaler Gabi",
+    role: "Közreműködő",
+    short: "Mélyen gondolkodik az AI és az emberi augmentáció kapcsolatáról — Substack-cikkekben, filozofikus csoportposztokban és olyan kérdésekben, amiket mások nem mernek feltenni."
+  }
 ];
 
 const CATEGORY_COLORS = {
