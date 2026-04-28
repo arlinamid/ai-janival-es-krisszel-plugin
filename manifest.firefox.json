@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AI - Janival és Krisszel",
   "description": "Friss posztok, mentett Facebook-bejegyzések és AI asszisztens egy oldalsávban.",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "browser_specific_settings": {
     "gecko": {
       "id": "ai-janival-krisszel@plugin",

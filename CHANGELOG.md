@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.1] - 2026-04-28
+
+### Javítva
+- ZIP fájl struktúra: a `manifest.json` mostantól a ZIP gyökerében van (volt: almappában), Firefox és Chrome Web Store kompatibilitás.
+
 ## [0.4.0] - 2026-04-28
 
 ### Új funkció: Keresztböngésző támogatás (Firefox / Opera / Vivaldi)
