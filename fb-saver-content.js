@@ -15,9 +15,37 @@ const SVG_OK = `<svg viewBox="0 0 24 24" width="20" height="20">
     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
+// ── Extension context guard ───────────────────────────────────────────────────
+// Ha a plugin újratöltődik miközben a content script fut, a chrome.runtime
+// kontextus érvénytelenné válik. Teardown leállítja az összes figyelőt.
+let _contextAlive = true;
+
+function isContextAlive() {
+  if (!_contextAlive) return false;
+  try {
+    // Ha a kontextus érvénytelen, ez dob
+    void chrome.runtime.id;
+    return true;
+  } catch {
+    _contextAlive = false;
+    teardown();
+    return false;
+  }
+}
+
+function teardown() {
+  try { observer.disconnect(); } catch {}
+  window.removeEventListener("scroll", debounceProcess, { passive: true });
+  window.removeEventListener("popstate", debounceProcess);
+  clearTimeout(debounceProcess.timer);
+  document.getElementById("fbs-save-dialog")?.remove();
+}
+
+// ── Storage helpers ───────────────────────────────────────────────────────────
 function storageGet(keys) {
   return new Promise((resolve) => {
     try {
+      if (!isContextAlive()) return resolve({});
       chrome.storage.local.get(keys, resolve);
     } catch {
       resolve({});
@@ -28,6 +56,7 @@ function storageGet(keys) {
 function storageSet(values) {
   return new Promise((resolve) => {
     try {
+      if (!isContextAlive()) return resolve();
       chrome.storage.local.set(values, resolve);
     } catch {
       resolve();
@@ -536,31 +565,38 @@ function injectSidebarButton() {
   if (document.getElementById("fbs-open-sidepanel")) {
     return;
   }
+  if (!isContextAlive()) return;
 
-  const button = document.createElement("button");
-  button.id = "fbs-open-sidepanel";
-  button.type = "button";
-  button.title = "AI - Janival és Krisszel sidebar";
-  button.innerHTML = `<img src="${chrome.runtime.getURL("profile_image.jpg")}" alt="" />`;
-  button.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    chrome.runtime.sendMessage({ type: "openSidePanel" });
-  });
-
-  document.body.appendChild(button);
+  try {
+    const button = document.createElement("button");
+    button.id = "fbs-open-sidepanel";
+    button.type = "button";
+    button.title = "AI - Janival és Krisszel sidebar";
+    button.innerHTML = `<img src="${chrome.runtime.getURL("profile_image.jpg")}" alt="" />`;
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!isContextAlive()) return;
+      try { chrome.runtime.sendMessage({ type: "openSidePanel" }); } catch {}
+    });
+    document.body.appendChild(button);
+  } catch {}
 }
 
 function debounceProcess() {
+  if (!isContextAlive()) return;
   clearTimeout(debounceProcess.timer);
   debounceProcess.timer = setTimeout(processArticles, 500);
 }
 
-chrome.storage?.onChanged?.addListener((changes, area) => {
-  if (area === "local" && changes[FBS_POSTS_KEY]) {
-    refreshStarButtons();
-  }
-});
+try {
+  chrome.storage?.onChanged?.addListener((changes, area) => {
+    if (!isContextAlive()) return;
+    if (area === "local" && changes[FBS_POSTS_KEY]) {
+      refreshStarButtons();
+    }
+  });
+} catch {}
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
@@ -579,5 +615,8 @@ history.pushState = function pushState(...args) {
   debounceProcess();
   return result;
 };
+
+// Teardown ha a plugin újratöltődik (context invalidated esemény)
+window.addEventListener("unload", teardown, { once: true });
 
 processArticles();
