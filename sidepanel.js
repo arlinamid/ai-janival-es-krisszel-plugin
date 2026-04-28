@@ -77,6 +77,19 @@ import { marked } from "marked";
 const SUPPORTED_TEXT_LANGUAGES = ["en", "es", "ja"];
 const POSTS_URL = "http://ai-janival-es-krisszel.hu/posts-categorized.json";
 const ANNOUNCEMENTS_URL = "http://ai-janival-es-krisszel.hu/announcements.json";
+
+// Firefox extension pages don't bypass CORS for HTTP URLs — relay through background script
+async function fetchJson(url) {
+  try {
+    const r = await fetch(`${url}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return await r.json();
+  } catch {
+    const result = await chrome.runtime.sendMessage({ type: "FETCH_JSON", url });
+    if (!result.ok) throw new Error(result.error);
+    return result.data;
+  }
+}
 const MAX_CONTEXT_CHARS = 7000;
 const DEFAULT_GROUP_POST_BASE =
   "https://www.facebook.com/groups/ai.janival.es.krisszel/posts/";
@@ -549,9 +562,7 @@ function firstImage(record) {
 }
 
 async function loadLatestPosts() {
-  const response = await fetch(`${POSTS_URL}?t=${Date.now()}`, { cache: "no-store" });
-  if (!response.ok) throw new Error(`posts-categorized.json: HTTP ${response.status}`);
-  const data = await response.json();
+  const data = await fetchJson(POSTS_URL);
   return asRecordList(data)
     .map((record, index) => ({ ...record, __index: index }))
     .sort((a, b) => recordTimestamp(b) - recordTimestamp(a) || a.__index - b.__index);
@@ -559,9 +570,7 @@ async function loadLatestPosts() {
 
 async function loadAnnouncements() {
   try {
-    const response = await fetch(`${ANNOUNCEMENTS_URL}?t=${Date.now()}`, { cache: "no-store" });
-    if (!response.ok) return new Set();
-    const data = await response.json();
+    const data = await fetchJson(ANNOUNCEMENTS_URL);
     return new Set(Array.isArray(data.postIds) ? data.postIds.map(String) : []);
   } catch {
     return new Set();
@@ -947,9 +956,7 @@ function buildAuthorIndex(documents) {
 }
 
 async function loadKnowledgeBase() {
-  const response = await fetch(`${POSTS_URL}?t=${Date.now()}`, { cache: "no-store" });
-  if (!response.ok) throw new Error(`posts-categorized.json: HTTP ${response.status}`);
-  const data = await response.json();
+  const data = await fetchJson(POSTS_URL);
   const fileName = "posts-categorized.json";
   const fileDocuments = createDocuments(data, fileName);
   return buildKnowledgeIndex(fileDocuments, [

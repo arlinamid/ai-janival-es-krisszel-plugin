@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3] - 2026-04-28
+
+### Javítva
+- Firefox NetworkError javítva: a `fetch()` hívások background scripten keresztül kerülnek küldésre ha az extension page direkt fetch-e meghiúsul — Firefox CORS-korlátozás megkerülése.
+- `background.js`: `FETCH_JSON` üzenetkezelő hozzáadva a fetch relay-hez.
+- `sidepanel.js`: `fetchJson()` helper — direkt fetch-et próbál, fallback: background relay.
+
 ## [0.4.2] - 2026-04-28
 
 ### Javítva

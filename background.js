@@ -150,6 +150,18 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return false;
 
+  // Relay fetch through background to bypass Firefox CORS restrictions on extension pages
+  if (message?.type === "FETCH_JSON") {
+    fetch(`${message.url}?t=${Date.now()}`, { cache: "no-store" })
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => sendResponse({ ok: true, data }))
+      .catch((err) => sendResponse({ ok: false, error: String(err) }));
+    return true;
+  }
+
   if (message?.type === "openSidePanel") {
     const target = sender.tab?.id
       ? { tabId: sender.tab.id }
