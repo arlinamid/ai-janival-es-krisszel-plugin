@@ -2,13 +2,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
+  ArrowUpCircle,
   Bookmark,
   BookmarkCheck,
   BrainCircuit,
   Calendar,
   CalendarClock,
   Check,
+  ChevronDown,
   ChevronRight,
+  ChevronsDownUp,
+  ChevronsUpDown,
   CircleAlert,
   Copy,
   Database,
@@ -34,13 +38,17 @@ import {
 } from "lucide-react";
 
 const ICON_MAP = {
+  ArrowUpCircle,
   Bookmark,
   BookmarkCheck,
   BrainCircuit,
   Calendar,
   CalendarClock,
   Check,
+  ChevronDown,
   ChevronRight,
+  ChevronsDownUp,
+  ChevronsUpDown,
   CircleAlert,
   Copy,
   Database,
@@ -2511,7 +2519,7 @@ function TileSection({ label, posts, collapsed, onToggle }) {
         "aria-expanded": String(!collapsed)
       },
       React.createElement("span", null, label),
-      React.createElement(Icon, { name: collapsed ? "ChevronDown" : "ChevronUp", size: 14 })
+      React.createElement(Icon, { name: collapsed ? "ChevronsUpDown" : "ChevronsDownUp", size: 14 })
     ),
     React.createElement(
       "div",
@@ -2523,7 +2531,7 @@ function TileSection({ label, posts, collapsed, onToggle }) {
           "button",
           { type: "button", className: "section-more-chip", onClick: onToggle },
           `+ ${hiddenCount} további`,
-          React.createElement(Icon, { name: "ChevronDown", size: 11 })
+          React.createElement(Icon, { name: "ChevronsUpDown", size: 11 })
         )
       : null
   );
