@@ -2173,48 +2173,28 @@ function App() {
 // ─── GamePage ─────────────────────────────────────────────────────────────────
 const QUORIDOR_URL = "https://quoridor-snowy.vercel.app/";
 
-// Chrome extensions support <webview> with persistent partitioned storage.
-// Firefox does not support <webview> — uses <iframe> with frame-src CSP instead.
+// Chrome: <webview partition="persist:quoridor"> via DOM (React can't mount custom elements reliably)
+// Firefox: <iframe> (webview not supported)
 const USE_WEBVIEW = typeof chrome !== "undefined" && !!chrome.sidePanel;
 
 function GamePage() {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
-  const embedRef = useRef(null);
+  const containerRef = useRef(null);
 
   const openInTab = () => chrome.tabs.create({ url: QUORIDOR_URL });
 
-  // webview uses DOM events (loadstop/loadabort), not React synthetic events
   useEffect(() => {
-    if (!USE_WEBVIEW || !embedRef.current) return;
-    const wv = embedRef.current;
-    const onStop = () => setLoaded(true);
-    const onAbort = () => setError(true);
-    wv.addEventListener("loadstop", onStop);
-    wv.addEventListener("loadabort", onAbort);
-    return () => {
-      wv.removeEventListener("loadstop", onStop);
-      wv.removeEventListener("loadabort", onAbort);
-    };
+    if (!USE_WEBVIEW || !containerRef.current) return;
+    const wv = document.createElement("webview");
+    wv.src = QUORIDOR_URL;
+    wv.partition = "persist:quoridor";
+    wv.style.cssText = "width:100%;height:100%;border:none;display:block;";
+    wv.addEventListener("loadstop", () => setLoaded(true));
+    wv.addEventListener("loadabort", () => setError(true));
+    containerRef.current.appendChild(wv);
+    return () => { try { containerRef.current?.removeChild(wv); } catch {} };
   }, []);
-
-  const embed = USE_WEBVIEW
-    ? React.createElement("webview", {
-        ref: embedRef,
-        src: QUORIDOR_URL,
-        partition: "persist:quoridor",
-        className: `game-iframe ${loaded ? "visible" : ""}`,
-        allowtransparency: "true"
-      })
-    : React.createElement("iframe", {
-        ref: embedRef,
-        src: QUORIDOR_URL,
-        className: `game-iframe ${loaded ? "visible" : ""}`,
-        title: "Quoridor",
-        allow: "autoplay; storage-access",
-        onLoad: () => setLoaded(true),
-        onError: () => setError(true)
-      });
 
   return React.createElement(
     "div",
@@ -2229,19 +2209,10 @@ function GamePage() {
         "Quoridor"
       ),
       React.createElement(
-        "div",
-        { className: "game-toolbar-actions" },
-        !USE_WEBVIEW && React.createElement(
-          "span",
-          { className: "game-cookie-notice" },
-          "⚠ Mentett állás böngészőben:"
-        ),
-        React.createElement(
-          "button",
-          { className: "game-open-tab-btn", onClick: openInTab },
-          React.createElement(ExternalLink, { size: 13 }),
-          "Megnyitás"
-        )
+        "button",
+        { className: "game-open-tab-btn", onClick: openInTab },
+        React.createElement(ExternalLink, { size: 13 }),
+        "Megnyitás"
       )
     ),
     !loaded && !error && React.createElement(
@@ -2257,7 +2228,21 @@ function GamePage() {
       React.createElement("p", null, "A játék nem töltődött be."),
       React.createElement("button", { className: "game-open-btn", onClick: openInTab }, "Megnyitás böngészőben")
     ),
-    embed
+    USE_WEBVIEW
+      ? React.createElement("div", {
+          ref: containerRef,
+          className: `game-iframe ${loaded ? "visible" : ""}`,
+          style: { flex: 1, minHeight: 0 }
+        })
+      : React.createElement("iframe", {
+          src: QUORIDOR_URL,
+          className: `game-iframe ${loaded ? "visible" : ""}`,
+          title: "Quoridor",
+          allow: "autoplay; storage-access; pointer-lock",
+          allowFullScreen: true,
+          onLoad: () => setLoaded(true),
+          onError: () => setError(true)
+        })
   );
 }
 

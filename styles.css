@@ -2497,6 +2497,7 @@ h1 {
 
 .game-iframe {
   flex: 1;
+  min-height: 0;
   width: 100%;
   border: none;
   opacity: 0;
@@ -2507,8 +2508,7 @@ h1 {
 
 .game-loading,
 .game-error {
-  position: absolute;
-  inset: 36px 0 0;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2516,8 +2516,6 @@ h1 {
   gap: 12px;
   color: var(--muted);
   font-size: 13px;
-  z-index: 1;
-  pointer-events: none;
 }
 
 .game-error { pointer-events: auto; }
