@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.9] - 2026-04-28
+
+### Javítva
+- `fb-saver-content.js`: „Extension context invalidated" hiba megszüntetve — `isContextAlive()` guard minden `chrome.runtime.*` és `chrome.storage.*` hívás előtt ellenőrzi a kontextus érvényességét.
+- `teardown()`: plugin újratöltésekor automatikusan leállítja a MutationObserver-t, scroll/popstate figyelőket és a pending timeout-ot; bezárja a mentési dialógot.
+- `ChevronsUpDown` / `ChevronsDownUp` Lucide ikonok importálva — az összecsukható szekciók fejlécének chevron ikonjai mostantól helyesen jelennek meg.
+- `ArrowUpCircle` Lucide ikon importálva — az update banner ikonja helyesen jelenik meg.
+
 ## [0.3.8] - 2026-04-28
 
 ### Módosítva
