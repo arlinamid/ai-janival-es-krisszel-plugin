@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1] - 2026-04-28
+
+### Javítva
+- Chrome: webview DOM-ban mountolva (`document.createElement`) — React custom element korlátok megkerülve.
+- Firefox: `allow="pointer-lock"` + `allowFullScreen` az iframe-en — gombok és egér input javítva.
+- CSS: game-loading/error `flex:1` layout, nincs több absolute positioning.
+
 ## [0.5.0] - 2026-04-28
 
 ### Módosítva

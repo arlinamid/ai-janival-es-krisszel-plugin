@@ -163,6 +163,9 @@
   .visible {
     visibility: visible;
   }
+  .absolute {
+    position: absolute;
+  }
   .relative {
     position: relative;
   }
@@ -174,6 +177,9 @@
   }
   .contents {
     display: contents;
+  }
+  .flex {
+    display: flex;
   }
   .hidden {
     display: none;
