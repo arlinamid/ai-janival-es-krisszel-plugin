@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.7] - 2026-04-28
+
+### Módosítva
+- Panel megnyitáskor (visibilitychange) azonnali JSON frissítés — moderált/törölt posztok azonnal eltűnnek, nem kell 10 percet várni.
+- Concurrent refresh guard (`refreshing` flag) — ha egy frissítés folyamatban van, nem indít másikat.
+
 ## [0.5.6] - 2026-04-28
 
 ### Javítva

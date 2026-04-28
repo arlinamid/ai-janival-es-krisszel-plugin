@@ -1733,31 +1733,42 @@ function App() {
     return () => { cancelled = true; };
   }, []);
 
-  // 10 percenkénti adat-frissítés (posztok + ajánló)
+  // Adat-frissítés: panel megnyitásakor (visibilitychange) + 10 percenként
   useEffect(() => {
     const INTERVAL_MS = 10 * 60 * 1000;
     let timer = null;
+    let refreshing = false;
 
     async function refresh() {
+      if (refreshing) return;
+      refreshing = true;
       try {
         const [records, ids] = await Promise.all([loadLatestPosts(), loadAnnouncements()]);
-        setLatestPosts((prev) => {
-          const prevIds = new Set((prev.records || []).map((r) => r.postId));
-          const hasNew = records.some((r) => r.postId && !prevIds.has(r.postId));
-          return hasNew || prev.status !== "ready"
-            ? { status: "ready", records, error: "" }
-            : prev;
-        });
+        setLatestPosts({ status: "ready", records, error: "" });
         setAnnouncedIds({ status: "ready", ids });
       } catch {
         // csendesen ignoráljuk, marad a régi adat
       } finally {
+        refreshing = false;
         if (timer !== null) timer = setTimeout(refresh, INTERVAL_MS);
       }
     }
 
+    function onVisible() {
+      if (document.visibilityState === "visible") {
+        if (timer !== null) clearTimeout(timer);
+        timer = setTimeout(refresh, INTERVAL_MS);
+        refresh();
+      }
+    }
+
+    document.addEventListener("visibilitychange", onVisible);
     timer = setTimeout(refresh, INTERVAL_MS);
-    return () => { if (timer !== null) clearTimeout(timer); timer = null; };
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      if (timer !== null) clearTimeout(timer);
+      timer = null;
+    };
   }, []);
 
   useEffect(() => {
