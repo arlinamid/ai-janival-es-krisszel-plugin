@@ -2463,97 +2463,78 @@ function FounderCard({ founder: f }) {
   );
 }
 
-// ─── AjánlóSection ────────────────────────────────────────────────────────────
-function AjanlóSection({ posts }) {
-  if (!posts.length) return null;
+// ─── TileSection (shared: Ajánló + Legújabb) ──────────────────────────────────
+const TILE_PREVIEW = 2;
+
+function renderTile(r, i) {
+  const title = firstHeading(recordToText(r)) || "Cím nélkül";
+  const url = getPostUrl(r);
+  const cat = categorizeRecord(r);
+  const color = CATEGORY_COLORS[cat] || "#e3061b";
+  const image = firstImage(r);
   return React.createElement(
-    "section",
-    { className: "tabloid-section ajanlо-section" },
+    "button",
+    {
+      key: r.postId || i,
+      type: "button",
+      className: "latest-tile",
+      style: !image ? { background: color + "22", borderColor: color } : {},
+      onClick: () => url && openPostUrl(url),
+      "aria-label": title
+    },
+    image
+      ? React.createElement("img", { src: image, alt: "", className: "latest-tile-img", loading: "lazy" })
+      : React.createElement("div", { className: "latest-tile-no-img", style: { color } },
+          React.createElement(Icon, { name: "FileText", size: 18 })),
     React.createElement(
       "div",
-      { className: "tabloid-section-header" },
-      React.createElement("span", null, "AJÁNLÓ")
-    ),
-    React.createElement(
-      "div",
-      { className: "latest-tile-grid" },
-      posts.map((r, i) => {
-        const title = firstHeading(recordToText(r)) || "Cím nélkül";
-        const url = getPostUrl(r);
-        const cat = categorizeRecord(r);
-        const color = CATEGORY_COLORS[cat] || "#e3061b";
-        const image = firstImage(r);
-        return React.createElement(
-          "button",
-          {
-            key: r.postId || i,
-            type: "button",
-            className: "latest-tile ajanlо-tile",
-            style: !image ? { background: color + "22", borderColor: color } : {},
-            onClick: () => url && openPostUrl(url),
-            "aria-label": title
-          },
-          image
-            ? React.createElement("img", { src: image, alt: "", className: "latest-tile-img", loading: "lazy" })
-            : React.createElement("div", { className: "latest-tile-no-img", style: { color } },
-                React.createElement(Icon, { name: "FileText", size: 18 })),
-          React.createElement(
-            "div",
-            { className: "latest-tile-overlay" },
-            React.createElement("span", { className: "latest-tile-cat", style: { color: image ? "#fff" : color } }, cat),
-            React.createElement("span", { className: "latest-tile-title" }, title)
-          )
-        );
-      })
+      { className: "latest-tile-overlay" },
+      React.createElement("span", { className: "latest-tile-cat", style: { color: image ? "#fff" : color } }, cat),
+      React.createElement("span", { className: "latest-tile-title" }, title)
     )
   );
 }
 
-// ─── LatestSection ────────────────────────────────────────────────────────────
-function TrendingSection({ posts }) {
-  const top = posts.slice(0, 6);
-  if (!top.length) return null;
+function TileSection({ label, posts, collapsed, onToggle }) {
+  if (!posts.length) return null;
+  const visible = collapsed ? posts.slice(0, TILE_PREVIEW) : posts;
+  const hiddenCount = collapsed ? Math.max(0, posts.length - TILE_PREVIEW) : 0;
   return React.createElement(
     "section",
-    { className: "tabloid-section trending-section" },
+    { className: "tabloid-section" },
     React.createElement(
-      "div",
-      { className: "tabloid-section-header" },
-      React.createElement("span", null, "LEGÚJABB")
+      "button",
+      {
+        type: "button",
+        className: "tabloid-section-header tabloid-section-toggle",
+        onClick: onToggle,
+        "aria-expanded": String(!collapsed)
+      },
+      React.createElement("span", null, label),
+      React.createElement(Icon, { name: collapsed ? "ChevronDown" : "ChevronUp", size: 14 })
     ),
     React.createElement(
       "div",
       { className: "latest-tile-grid" },
-      top.map((r, i) => {
-        const title = firstHeading(recordToText(r)) || "Cím nélkül";
-        const url = getPostUrl(r);
-        const cat = categorizeRecord(r);
-        const color = CATEGORY_COLORS[cat] || "#e3061b";
-        const image = firstImage(r);
-        return React.createElement(
+      visible.map((r, i) => renderTile(r, i))
+    ),
+    collapsed && hiddenCount > 0
+      ? React.createElement(
           "button",
-          {
-            key: r.postId || i,
-            type: "button",
-            className: "latest-tile",
-            style: !image ? { background: color + "22", borderColor: color } : {},
-            onClick: () => url && openPostUrl(url),
-            "aria-label": title
-          },
-          image
-            ? React.createElement("img", { src: image, alt: "", className: "latest-tile-img", loading: "lazy" })
-            : React.createElement("div", { className: "latest-tile-no-img", style: { color } },
-                React.createElement(Icon, { name: "FileText", size: 18 })),
-          React.createElement(
-            "div",
-            { className: "latest-tile-overlay" },
-            React.createElement("span", { className: "latest-tile-cat", style: { color: image ? "#fff" : color } }, cat),
-            React.createElement("span", { className: "latest-tile-title" }, title)
-          )
-        );
-      })
-    )
+          { type: "button", className: "section-more-chip", onClick: onToggle },
+          `+ ${hiddenCount} további`,
+          React.createElement(Icon, { name: "ChevronDown", size: 11 })
+        )
+      : null
   );
+}
+
+function AjanlóSection({ posts, collapsed, onToggle }) {
+  return React.createElement(TileSection, { label: "AJÁNLÓ", posts, collapsed, onToggle });
+}
+
+function TrendingSection({ posts, collapsed, onToggle }) {
+  return React.createElement(TileSection, { label: "LEGÚJABB", posts: posts.slice(0, 6), collapsed, onToggle });
 }
 
 // ─── CategoryBar ──────────────────────────────────────────────────────────────
@@ -2657,6 +2638,24 @@ function HomePage({ latestPosts, nextEvent, knowledgeRef, announcedIds }) {
   const [activeCategory, setActiveCategory] = useState("Mind");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [collapsedAjanlо, setCollapsedAjanlо] = useState(
+    () => localStorage.getItem("fbs_collapsed_ajanlо") === "1"
+  );
+  const [collapsedLegujabb, setCollapsedLegujabb] = useState(
+    () => localStorage.getItem("fbs_collapsed_legujabb") === "1"
+  );
+
+  const toggleAjanlо = () => setCollapsedAjanlо((v) => {
+    const next = !v;
+    localStorage.setItem("fbs_collapsed_ajanlо", next ? "1" : "0");
+    return next;
+  });
+  const toggleLegujabb = () => setCollapsedLegujabb((v) => {
+    const next = !v;
+    localStorage.setItem("fbs_collapsed_legujabb", next ? "1" : "0");
+    return next;
+  });
+
   const records = latestPosts.records || [];
   const annotated = records.map((r) => ({ ...r, _cat: categorizeRecord(r) }));
 
@@ -2684,10 +2683,10 @@ function HomePage({ latestPosts, nextEvent, knowledgeRef, announcedIds }) {
       : null,
     React.createElement(FoundersSection),
     announcedPosts.length
-      ? React.createElement(AjanlóSection, { posts: announcedPosts })
+      ? React.createElement(AjanlóSection, { posts: announcedPosts, collapsed: collapsedAjanlо, onToggle: toggleAjanlо })
       : null,
     latestPosts.status === "ready"
-      ? React.createElement(TrendingSection, { posts: annotated })
+      ? React.createElement(TrendingSection, { posts: annotated, collapsed: collapsedLegujabb, onToggle: toggleLegujabb })
       : null,
     React.createElement(
       "section",

@@ -1620,6 +1620,53 @@ h1 {
 }
 .founders-discord:hover { text-decoration: underline; }
 
+/* ── Collapsible section header ──────────────────────────────── */
+.tabloid-section-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 8px;
+  border: none;
+  border-bottom: 2px solid var(--t-red);
+  border-radius: 0;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  color: var(--t-red);
+}
+
+.tabloid-section-toggle:hover { background: #fdf0f0; }
+.tabloid-section-toggle:focus-visible { outline: 2px solid var(--t-red); outline-offset: -2px; }
+
+.tabloid-section-toggle span {
+  font-family: var(--t-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.section-more-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 7px 14px;
+  border: none;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+  color: var(--t-red);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background 0.15s;
+}
+
+.section-more-chip:hover { background: #fdf0f0; }
+
 /* ── Latest tiles ────────────────────────────────────────────── */
 .latest-tile-grid {
   display: grid;
