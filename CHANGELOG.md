@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.7] - 2026-04-28
+
+### Javítva
+- Tab bar: `grid-template-columns: repeat(4, ...)` — a Quoridor tab nem kerül új sorba, minden tab egy sorban marad.
+- Tab gombok kisebb padding és font-size, jobb helykihasználás 4 tab esetén.
+
 ## [0.4.6] - 2026-04-28
 
 ### Hozzáadva
