@@ -24,7 +24,6 @@ const COPY_ENTRIES = [
   "icon.png",
   "profile_image.jpg",
   "profile-images",
-  "database",
   "vendor/tailwind.css"
 ];
 
