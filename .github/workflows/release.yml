@@ -25,21 +25,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build (dist only)
-        run: node scripts/release.js --dist-only
-
       - name: Get version from manifest
         id: version
-        run: echo "version=$(node -p "require('./manifest.json').version")" >> $GITHUB_OUTPUT
+        run: echo "version=$(node -p "require('./manifest.chrome.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Package zip
+      - name: Build & package both targets
         run: node scripts/release.js
 
       - name: Update updates.xml
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           REPO="arlinamid/ai-janival-es-krisszel-plugin"
-          ZIP_URL="https://github.com/${REPO}/releases/download/v${VERSION}/ai-janival-es-krisszel-plugin-v${VERSION}.zip"
+          ZIP_URL="https://github.com/${REPO}/releases/download/v${VERSION}/ai-janival-es-krisszel-plugin-chrome-v${VERSION}.zip"
           EXT_ID=$(grep -o 'appid="[^"]*"' updates.xml | sed 's/appid="//;s/"//' || echo "EXTENSION_ID_HERE")
           cat > updates.xml <<EOF
           <?xml version='1.0' encoding='UTF-8'?>
@@ -63,5 +60,7 @@ jobs:
         with:
           name: "v${{ steps.version.outputs.version }}"
           body_path: CHANGELOG.md
-          files: releases/ai-janival-es-krisszel-plugin-v${{ steps.version.outputs.version }}.zip
+          files: |
+            releases/ai-janival-es-krisszel-plugin-chrome-v${{ steps.version.outputs.version }}.zip
+            releases/ai-janival-es-krisszel-plugin-firefox-v${{ steps.version.outputs.version }}.zip
           make_latest: true

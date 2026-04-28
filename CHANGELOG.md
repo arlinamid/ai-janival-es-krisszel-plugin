@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.0] - 2026-04-28
+
+### Új funkció: Keresztböngésző támogatás (Firefox / Opera / Vivaldi)
+- Külön manifest fájlok: `manifest.chrome.json` és `manifest.firefox.json` (MV3, `sidebar_action`).
+- `webextension-polyfill` hozzáadva a Firefox API kompatibilitáshoz.
+- Firefox fallback: `browser.sidebarAction.open()` ha `chrome.sidePanel` nem elérhető.
+- AI chat automatikusan le van tiltva nem-Chrome böngészőkben — info szöveg jelenik meg.
+- Dual build: `scripts/release.js` most két külön ZIP-et generál (`-chrome-` és `-firefox-` névvel).
+- GitHub Actions workflow frissítve: mindkét ZIP feltöltődik a release asset-ek közé.
+- Új npm scriptek: `build:firefox`, `build:release:chrome`, `build:release:firefox`.
+
 ## [0.3.9] - 2026-04-28
 
 ### Javítva

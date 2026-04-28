@@ -9,15 +9,18 @@ const esbuild = require("esbuild");
 const ROOT = path.resolve(__dirname, "..");
 const DIST = path.join(ROOT, "dist");
 const RELEASES = path.join(ROOT, "releases");
-const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.json"), "utf8"));
-const version = manifest.version;
-const releaseName = `ai-janival-es-krisszel-plugin-v${version}`;
-const releaseDir = path.join(RELEASES, releaseName);
-const zipPath = path.join(RELEASES, `${releaseName}.zip`);
-const distOnly = process.argv.includes("--dist-only");
 
-const COPY_ENTRIES = [
-  "manifest.json",
+// ── CLI flags ────────────────────────────────────────────────────────────────
+const distOnly = process.argv.includes("--dist-only");
+const rawTarget = (process.argv.find((a) => a.startsWith("--target=")) || "").replace("--target=", "") || "all";
+const TARGETS = rawTarget === "all" ? ["chrome", "firefox"] : [rawTarget];
+
+// Read version from manifest.chrome.json (canonical source of truth)
+const chromeManifest = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.chrome.json"), "utf8"));
+const version = chromeManifest.version;
+
+// ── Shared files (same for all targets) ─────────────────────────────────────
+const COPY_ENTRIES_SHARED = [
   "sidepanel.html",
   "styles.css",
   "fb-saver-content.css",
@@ -29,7 +32,6 @@ const COPY_ENTRIES = [
 
 function assertInsideRoot(target) {
   const relative = path.relative(ROOT, target);
-
   if (relative.startsWith("..") || path.isAbsolute(relative)) {
     throw new Error(`Refusing to write outside project root: ${target}`);
   }
@@ -44,46 +46,36 @@ function resetDir(dir) {
 function copyEntry(relativePath, destinationRoot) {
   const source = path.join(ROOT, relativePath);
   const destination = path.join(destinationRoot, relativePath);
-
   if (!fs.existsSync(source)) {
     throw new Error(`Missing release asset: ${relativePath}`);
   }
-
   fs.mkdirSync(path.dirname(destination), { recursive: true });
   fs.cpSync(source, destination, { recursive: true });
 }
 
 function runTailwindBuild() {
-  const tailwindCli = path.join(
-    ROOT,
-    "node_modules",
-    "@tailwindcss",
-    "cli",
-    "dist",
-    "index.mjs"
-  );
-
+  const tailwindCli = path.join(ROOT, "node_modules", "@tailwindcss", "cli", "dist", "index.mjs");
   if (!fs.existsSync(tailwindCli)) {
     throw new Error("Tailwind CLI is missing. Run npm install first.");
   }
-
   execFileSync(process.execPath, [
     tailwindCli,
-    "-i",
-    path.join(ROOT, "tailwind.input.css"),
-    "-o",
-    path.join(ROOT, "vendor", "tailwind.css")
+    "-i", path.join(ROOT, "tailwind.input.css"),
+    "-o", path.join(ROOT, "vendor", "tailwind.css")
   ], { stdio: "inherit" });
 }
 
-async function runEsbuildBundle() {
+async function runEsbuildBundle(browserTarget) {
+  // Chrome uses chrome120, Firefox uses firefox121
+  const target = browserTarget === "firefox" ? ["firefox121"] : ["chrome120"];
+
   await esbuild.build({
     entryPoints: [path.join(ROOT, "sidepanel.js")],
     bundle: true,
     outfile: path.join(DIST, "sidepanel.js"),
     platform: "browser",
     format: "iife",
-    target: ["chrome120"],
+    target,
     minify: true,
     sourcemap: false
   });
@@ -94,7 +86,7 @@ async function runEsbuildBundle() {
     outfile: path.join(DIST, "background.js"),
     platform: "browser",
     format: "esm",
-    target: ["chrome120"],
+    target,
     minify: true,
     sourcemap: false
   });
@@ -105,85 +97,69 @@ async function runEsbuildBundle() {
     outfile: path.join(DIST, "fb-saver-content.js"),
     platform: "browser",
     format: "iife",
-    target: ["chrome120"],
+    target,
     minify: true,
     sourcemap: false
   });
 }
 
-async function buildDist() {
+async function buildDist(browserTarget) {
   runTailwindBuild();
   resetDir(DIST);
-  await runEsbuildBundle();
-  COPY_ENTRIES.forEach((entry) => copyEntry(entry, DIST));
+  await runEsbuildBundle(browserTarget);
+
+  // Copy shared assets
+  COPY_ENTRIES_SHARED.forEach((entry) => copyEntry(entry, DIST));
+
+  // Copy the target-specific manifest as manifest.json
+  const manifestSrc = path.join(ROOT, `manifest.${browserTarget}.json`);
+  if (!fs.existsSync(manifestSrc)) {
+    throw new Error(`Missing manifest: manifest.${browserTarget}.json`);
+  }
+  fs.copyFileSync(manifestSrc, path.join(DIST, "manifest.json"));
 }
 
-function copyDistToRelease() {
-  resetDir(releaseDir);
-  fs.cpSync(DIST, releaseDir, { recursive: true });
-}
-
+// ── ZIP builder (unchanged) ──────────────────────────────────────────────────
 const CRC_TABLE = (() => {
   const table = new Uint32Array(256);
-
   for (let index = 0; index < 256; index += 1) {
     let value = index;
-
     for (let bit = 0; bit < 8; bit += 1) {
       value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
     }
-
     table[index] = value >>> 0;
   }
-
   return table;
 })();
 
 function crc32(buffer) {
   let crc = 0xffffffff;
-
   for (const byte of buffer) {
     crc = CRC_TABLE[(crc ^ byte) & 0xff] ^ (crc >>> 8);
   }
-
   return (crc ^ 0xffffffff) >>> 0;
 }
 
 function toDosDateTime(date) {
   const year = Math.max(date.getFullYear(), 1980);
-  const dosTime =
-    (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2);
+  const dosTime = (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2);
   const dosDate = ((year - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate();
-
   return { dosDate, dosTime };
 }
 
 function walkFiles(dir, base = dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const fullPath = path.join(dir, entry.name);
-
-    if (entry.isDirectory()) {
-      return walkFiles(fullPath, base);
-    }
-
-    return [
-      {
-        fullPath,
-        relativePath: path.relative(base, fullPath).replace(/\\/g, "/")
-      }
-    ];
+    if (entry.isDirectory()) return walkFiles(fullPath, base);
+    return [{ fullPath, relativePath: path.relative(base, fullPath).replace(/\\/g, "/") }];
   });
 }
 
-function createZip() {
-  if (!fs.existsSync(RELEASES)) {
-    fs.mkdirSync(RELEASES, { recursive: true });
-  }
+function createZip(releaseDir, zipPath) {
+  if (!fs.existsSync(RELEASES)) fs.mkdirSync(RELEASES, { recursive: true });
+  if (fs.existsSync(zipPath)) fs.rmSync(zipPath, { force: true });
 
-  if (fs.existsSync(zipPath)) {
-    fs.rmSync(zipPath, { force: true });
-  }
-
+  const releaseName = path.basename(releaseDir);
   const localParts = [];
   const centralParts = [];
   let offset = 0;
@@ -209,7 +185,6 @@ function createZip() {
     localHeader.writeUInt32LE(data.length, 22);
     localHeader.writeUInt16LE(name.length, 26);
     localHeader.writeUInt16LE(0, 28);
-
     localParts.push(localHeader, name, compressed);
 
     const centralHeader = Buffer.alloc(46);
@@ -231,7 +206,6 @@ function createZip() {
     centralHeader.writeUInt32LE(0, 38);
     centralHeader.writeUInt32LE(offset, 42);
     centralParts.push(centralHeader, name);
-
     offset += localHeader.length + name.length + compressed.length;
   });
 
@@ -250,22 +224,32 @@ function createZip() {
   fs.writeFileSync(zipPath, Buffer.concat([...localParts, centralBuffer, endHeader]));
 }
 
+// ── Main ─────────────────────────────────────────────────────────────────────
 (async () => {
-  await buildDist();
+  if (!fs.existsSync(RELEASES)) fs.mkdirSync(RELEASES, { recursive: true });
 
-  if (!distOnly) {
-    if (!fs.existsSync(RELEASES)) {
-      fs.mkdirSync(RELEASES, { recursive: true });
+  for (const browserTarget of TARGETS) {
+    await buildDist(browserTarget);
+
+    if (distOnly) {
+      console.log(`Built dist (${browserTarget})`);
+      continue;
     }
 
-    copyDistToRelease();
-    createZip();
+    const releaseName = `ai-janival-es-krisszel-plugin-${browserTarget}-v${version}`;
+    const releaseDir = path.join(RELEASES, releaseName);
+    const zipPath = path.join(RELEASES, `${releaseName}.zip`);
+
+    fs.rmSync(releaseDir, { recursive: true, force: true });
+    fs.cpSync(DIST, releaseDir, { recursive: true });
+    createZip(releaseDir, zipPath);
+
+    const sizeKb = (fs.statSync(zipPath).size / 1024).toFixed(1);
+    console.log(`Built releases/${releaseName}.zip (${sizeKb} KB)`);
   }
 
-  const outputPath = distOnly ? DIST : zipPath;
-  const sizeKb = fs.statSync(outputPath).isDirectory()
-    ? ""
-    : ` (${(fs.statSync(outputPath).size / 1024).toFixed(1)} KB)`;
-
-  console.log(`Built ${path.relative(ROOT, outputPath)}${sizeKb}`);
+  if (distOnly) {
+    const outputSize = "";
+    console.log(`Built dist${outputSize}`);
+  }
 })();
