@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.8] - 2026-04-28
+
+### Módosítva
+- AJÁNLÓ és LEGÚJABB szekciók összecsukhatók: fejlécre kattintva nyit/zár, chevron ikonnal jelezve.
+- Összecsukott állapotban 2 csempe látszik + „+ N további" chip az összes darabszámmal.
+- Az összecsukott/kibontott állapot `localStorage`-ban megmarad panel újranyitás után is.
+- `TileSection` közös komponens: a két szekció kód-duplikációja megszüntetve.
+
 ## [0.3.7] - 2026-04-28
 
 ### Eltávolítva
