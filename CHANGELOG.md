@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.6] - 2026-04-28
+
+### Hozzáadva
+- **Quoridor játék tab**: új „Quoridor" tab a sidepanelben, iframe-ben beágyazva a https://quoridor-snowy.vercel.app/ oldal.
+- `Newspaper` és `Gamepad2` Lucide ikonok hozzáadva az icon maphez.
+
 ## [0.4.5] - 2026-04-28
 
 ### Hozzáadva

@@ -20,10 +20,12 @@ import {
   ExternalLink,
   FileText,
   FolderPlus,
+  Gamepad2,
   History,
   Info,
   LogIn,
   MessageSquareText,
+  Newspaper,
   Plus,
   Radio,
   RefreshCw,
@@ -56,10 +58,12 @@ const ICON_MAP = {
   ExternalLink,
   FileText,
   FolderPlus,
+  Gamepad2,
   History,
   Info,
   LogIn,
   MessageSquareText,
+  Newspaper,
   Plus,
   Radio,
   RefreshCw,
@@ -2122,6 +2126,9 @@ function App() {
     activeTab === "tools"
       ? React.createElement(PluginToolsPage, null)
       : null,
+    activeTab === "game"
+      ? React.createElement(GamePage, null)
+      : null,
     activeTab === "chat" && !aiTermsAccepted
       ? React.createElement(AiTermsScreen, {
           onAccept: () => {
@@ -2163,11 +2170,50 @@ function App() {
   );
 }
 
+// ─── GamePage ─────────────────────────────────────────────────────────────────
+const QUORIDOR_URL = "https://quoridor-snowy.vercel.app/";
+
+function GamePage() {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  return React.createElement(
+    "div",
+    { className: "game-page" },
+    !loaded && !error && React.createElement(
+      "div",
+      { className: "game-loading" },
+      React.createElement(Gamepad2, { size: 32, strokeWidth: 1.5 }),
+      React.createElement("p", null, "Játék betöltése…")
+    ),
+    error && React.createElement(
+      "div",
+      { className: "game-error" },
+      React.createElement(Gamepad2, { size: 32, strokeWidth: 1.5 }),
+      React.createElement("p", null, "A játék nem töltődött be."),
+      React.createElement(
+        "a",
+        { href: QUORIDOR_URL, target: "_blank", rel: "noopener noreferrer", className: "game-open-btn" },
+        "Megnyitás új lapon"
+      )
+    ),
+    React.createElement("iframe", {
+      src: QUORIDOR_URL,
+      className: `game-iframe ${loaded ? "visible" : ""}`,
+      title: "Quoridor",
+      allow: "autoplay",
+      onLoad: () => setLoaded(true),
+      onError: () => setError(true)
+    })
+  );
+}
+
 function TabBar({ activeTab, onTabChange }) {
   const tabs = [
     { id: "home", label: "Friss posztok", icon: "Newspaper" },
     { id: "tools", label: "Mentett posztok", icon: "BookmarkCheck" },
-    { id: "chat", label: "AI chat", icon: "MessageSquareText" }
+    { id: "chat", label: "AI chat", icon: "MessageSquareText" },
+    { id: "game", label: "Quoridor", icon: "Gamepad2" }
   ];
 
   return React.createElement(
