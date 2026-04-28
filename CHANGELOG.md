@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.4] - 2026-04-28
+
+### Javítva
+- Chrome: `pointer-lock` eltávolítva az iframe `allow` attribútumból — Chrome nem ismeri ezt a Permissions Policy feature nevet, hibát okozott.
+
 ## [0.5.3] - 2026-04-28
 
 ### Javítva

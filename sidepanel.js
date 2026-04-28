@@ -2225,7 +2225,7 @@ function GamePage() {
       src: QUORIDOR_URL,
       className: `game-iframe ${loaded ? "visible" : ""}`,
       title: "Quoridor",
-      allow: "autoplay; storage-access; pointer-lock",
+      allow: "autoplay; storage-access",
       allowFullScreen: true,
       onLoad: () => setLoaded(true),
       onError: () => setError(true)
