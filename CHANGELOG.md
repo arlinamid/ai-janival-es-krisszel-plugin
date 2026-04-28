@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.8] - 2026-04-28
+
+### Módosítva
+- Quoridor game tab: toolbar hozzáadva „Megnyitás" gombbal — a játék cookie-jai (mentett állás) csak böngészőfülön elérhetők, az iframe ezt nem tudja feloldani (third-party cookie blokkolás).
+- `allow="storage-access"` az iframe-en, hogy a böngésző engedélyezhesse a cookie-hozzáférést ha a felhasználó hozzájárul.
+
 ## [0.4.7] - 2026-04-28
 
 ### Javítva

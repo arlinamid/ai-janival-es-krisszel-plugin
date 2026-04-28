@@ -2446,11 +2446,58 @@ h1 {
   background: var(--bg);
 }
 
+.game-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.game-toolbar-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.game-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-cookie-notice {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.game-open-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.game-open-tab-btn:hover { opacity: 0.85; }
+
 .game-iframe {
-  position: absolute;
-  inset: 0;
+  flex: 1;
   width: 100%;
-  height: 100%;
   border: none;
   opacity: 0;
   transition: opacity 0.3s;
@@ -2461,7 +2508,7 @@ h1 {
 .game-loading,
 .game-error {
   position: absolute;
-  inset: 0;
+  inset: 36px 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2482,10 +2529,11 @@ h1 {
   padding: 7px 16px;
   background: var(--accent);
   color: #fff;
+  border: none;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
-  text-decoration: none;
+  cursor: pointer;
 }
 .game-open-btn:hover { opacity: 0.85; }
 

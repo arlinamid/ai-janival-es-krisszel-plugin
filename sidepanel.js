@@ -2177,9 +2177,38 @@ function GamePage() {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
 
+  const openInTab = () => chrome.tabs.create({ url: QUORIDOR_URL });
+
   return React.createElement(
     "div",
     { className: "game-page" },
+    // Toolbar
+    React.createElement(
+      "div",
+      { className: "game-toolbar" },
+      React.createElement(
+        "span",
+        { className: "game-toolbar-title" },
+        React.createElement(Gamepad2, { size: 14 }),
+        "Quoridor"
+      ),
+      React.createElement(
+        "div",
+        { className: "game-toolbar-actions" },
+        React.createElement(
+          "span",
+          { className: "game-cookie-notice" },
+          "⚠ A mentett állás böngészőben érhető el:"
+        ),
+        React.createElement(
+          "button",
+          { className: "game-open-tab-btn", onClick: openInTab, title: "Megnyitás böngészőfülön (teljes cookie-hozzáférés)" },
+          React.createElement(ExternalLink, { size: 13 }),
+          "Megnyitás"
+        )
+      )
+    ),
+    // Loading / error states
     !loaded && !error && React.createElement(
       "div",
       { className: "game-loading" },
@@ -2192,16 +2221,16 @@ function GamePage() {
       React.createElement(Gamepad2, { size: 32, strokeWidth: 1.5 }),
       React.createElement("p", null, "A játék nem töltődött be."),
       React.createElement(
-        "a",
-        { href: QUORIDOR_URL, target: "_blank", rel: "noopener noreferrer", className: "game-open-btn" },
-        "Megnyitás új lapon"
+        "button",
+        { className: "game-open-btn", onClick: openInTab },
+        "Megnyitás böngészőben"
       )
     ),
     React.createElement("iframe", {
       src: QUORIDOR_URL,
       className: `game-iframe ${loaded ? "visible" : ""}`,
       title: "Quoridor",
-      allow: "autoplay",
+      allow: "autoplay; storage-access",
       onLoad: () => setLoaded(true),
       onError: () => setError(true)
     })
