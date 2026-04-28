@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
   <app appid=''>
-    <updatecheck codebase='https://github.com/arlinamid/ai-janival-es-krisszel-plugin/releases/download/v0.3.7/ai-janival-es-krisszel-plugin-v0.3.7.zip' version='0.3.7' />
+    <updatecheck codebase='https://github.com/arlinamid/ai-janival-es-krisszel-plugin/releases/download/v0.3.8/ai-janival-es-krisszel-plugin-v0.3.8.zip' version='0.3.8' />
   </app>
 </gupdate>
