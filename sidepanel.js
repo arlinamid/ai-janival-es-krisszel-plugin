@@ -2173,28 +2173,10 @@ function App() {
 // ─── GamePage ─────────────────────────────────────────────────────────────────
 const QUORIDOR_URL = "https://quoridor-snowy.vercel.app/";
 
-// Chrome: <webview partition="persist:quoridor"> via DOM (React can't mount custom elements reliably)
-// Firefox: <iframe> (webview not supported)
-const USE_WEBVIEW = typeof chrome !== "undefined" && !!chrome.sidePanel;
-
 function GamePage() {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
-  const containerRef = useRef(null);
-
   const openInTab = () => chrome.tabs.create({ url: QUORIDOR_URL });
-
-  useEffect(() => {
-    if (!USE_WEBVIEW || !containerRef.current) return;
-    const wv = document.createElement("webview");
-    wv.src = QUORIDOR_URL;
-    wv.partition = "persist:quoridor";
-    wv.style.cssText = "width:100%;height:100%;border:none;display:block;";
-    wv.addEventListener("loadstop", () => setLoaded(true));
-    wv.addEventListener("loadabort", () => setError(true));
-    containerRef.current.appendChild(wv);
-    return () => { try { containerRef.current?.removeChild(wv); } catch {} };
-  }, []);
 
   return React.createElement(
     "div",
@@ -2228,21 +2210,15 @@ function GamePage() {
       React.createElement("p", null, "A játék nem töltődött be."),
       React.createElement("button", { className: "game-open-btn", onClick: openInTab }, "Megnyitás böngészőben")
     ),
-    USE_WEBVIEW
-      ? React.createElement("div", {
-          ref: containerRef,
-          className: `game-iframe ${loaded ? "visible" : ""}`,
-          style: { flex: 1, minHeight: 0 }
-        })
-      : React.createElement("iframe", {
-          src: QUORIDOR_URL,
-          className: `game-iframe ${loaded ? "visible" : ""}`,
-          title: "Quoridor",
-          allow: "autoplay; storage-access; pointer-lock",
-          allowFullScreen: true,
-          onLoad: () => setLoaded(true),
-          onError: () => setError(true)
-        })
+    React.createElement("iframe", {
+      src: QUORIDOR_URL,
+      className: `game-iframe ${loaded ? "visible" : ""}`,
+      title: "Quoridor",
+      allow: "autoplay; storage-access; pointer-lock",
+      allowFullScreen: true,
+      onLoad: () => setLoaded(true),
+      onError: () => setError(true)
+    })
   );
 }
 
