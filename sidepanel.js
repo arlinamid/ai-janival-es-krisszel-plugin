@@ -2626,25 +2626,120 @@ function TabloidsPostCard({ record }) {
   );
 }
 
+// ─── LegalModal ───────────────────────────────────────────────────────────────
+const PRIVACY_CONTENT = `# Adatvédelmi nyilatkozat
+
+## Összefoglalás
+
+Ez a bővítmény nem gyűjt, nem tárol és nem továbbít személyes adatokat külső szerverekre. Minden adat, amit a bővítmény kezel, kizárólag a te eszközödön marad.
+
+## Milyen adatokat kezel?
+
+**Mentett posztok** — ha a Facebookon a „Mentés" gombra kattintasz, a poszt tartalma az eszközödön, helyi tárolóban kerül elmentésre. Nem kerül semmilyen külső szerverre.
+
+**Beállítások** — a saját kategóriáid és beállításaid szintén helyi tárolóban vannak.
+
+**Poszt-lista** — a bővítmény letölti a csoport nyilvánosan elérhető poszt-listáját kizárólag olvasás céljából. Ezt az adatot nem tárolja tartósan és nem osztja meg senkivel.
+
+## Mit NEM végez?
+
+- Nem követ nyomon, nem gyűjt analitikát
+- Nem küld adatokat harmadik félnek
+- Nem fér hozzá a Facebook-fiókodhoz, jelszavaidhoz vagy üzeneteidhez
+- Nem tartalmaz hirdetéseket
+
+## Beépített AI chat
+
+Az AI chat kizárólag a böngésződbe beépített helyi AI modellt használja. A kérdéseid és válaszok nem hagyják el az eszközödet.
+
+## Kapcsolat
+
+E-mail: janos.rozsavolgyi2@gmail.com`;
+
+const TERMS_CONTENT = `# Felhasználási feltételek
+
+## A bővítményről
+
+Az AI – Janival és Krisszel bővítmény az azonos nevű magyar Facebook-csoport tagjainak készült. Célja a csoport tartalmának kényelmes böngészése, posztok mentése és AI-alapú segítség.
+
+## Használati feltételek
+
+**Személyes használat** — a bővítmény kizárólag személyes, nem kereskedelmi célra használható.
+
+**Tartalom** — a megjelenített posztok az „AI – Janival és Krisszel" Facebook-csoport nyilvánosan elérhető tartalmai. A szerzői jogok az eredeti szerzőket illetik.
+
+**Felelősség kizárása** — a bővítményt „ahogy van" állapotban biztosítjuk, mindenféle garancia nélkül.
+
+## Kapcsolat a Facebookkal
+
+Ez a bővítmény nem a Meta Platforms, Inc. terméke és nem áll kapcsolatban azzal.
+
+## AI chat
+
+Az AI chat a böngésző gyártója által fejlesztett beépített modellt használja. A fejlesztők nem felelnek a modelltől kapott válaszok pontosságáért.
+
+## Kapcsolat
+
+E-mail: janos.rozsavolgyi2@gmail.com`;
+
+function LegalModal({ type, onClose }) {
+  const content = type === "privacy" ? PRIVACY_CONTENT : TERMS_CONTENT;
+  const html = marked.parse(content);
+  return React.createElement(
+    "div",
+    {
+      className: "legal-modal-overlay",
+      onClick: (e) => { if (e.target === e.currentTarget) onClose(); }
+    },
+    React.createElement(
+      "div",
+      { className: "legal-modal" },
+      React.createElement(
+        "div",
+        { className: "legal-modal-header" },
+        React.createElement(
+          "button",
+          { className: "legal-modal-close", onClick: onClose, "aria-label": "Bezárás" },
+          React.createElement(X, { size: 18 })
+        )
+      ),
+      React.createElement("div", {
+        className: "legal-modal-body markdown-body",
+        dangerouslySetInnerHTML: { __html: html }
+      })
+    )
+  );
+}
+
 // ─── TabloidFooter ────────────────────────────────────────────────────────────
 function TabloidFooter() {
+  const [legalOpen, setLegalOpen] = useState(null);
   return React.createElement(
-    "footer",
-    { className: "tabloid-footer" },
+    React.Fragment,
+    null,
+    legalOpen && React.createElement(LegalModal, { type: legalOpen, onClose: () => setLegalOpen(null) }),
     React.createElement(
-      "div",
-      { className: "tabloid-footer-brand" },
-      React.createElement("span", { className: "tabloid-footer-logo" }, APP_NAME)
-    ),
-    React.createElement("p", { className: "tabloid-footer-tagline" }, "A magyar AI közösség hírportálja"),
-    React.createElement(
-      "div",
-      { className: "tabloid-footer-links" },
-      React.createElement("a", { href: "https://www.facebook.com/groups/ai.janival.es.krisszel", target: "_blank", rel: "noopener noreferrer" }, "Facebook csoport"),
-      React.createElement("span", { "aria-hidden": "true" }, "·"),
-      React.createElement("a", { href: "mailto:janos.rozsavolgyi2@gmail.com" }, "Kapcsolat")
-    ),
-    React.createElement("p", { className: "tabloid-footer-copy" }, `© ${new Date().getFullYear()} ${APP_NAME}`)
+      "footer",
+      { className: "tabloid-footer" },
+      React.createElement(
+        "div",
+        { className: "tabloid-footer-brand" },
+        React.createElement("span", { className: "tabloid-footer-logo" }, APP_NAME)
+      ),
+      React.createElement("p", { className: "tabloid-footer-tagline" }, "A magyar AI közösség hírportálja"),
+      React.createElement(
+        "div",
+        { className: "tabloid-footer-links" },
+        React.createElement("a", { href: "https://www.facebook.com/groups/ai.janival.es.krisszel", target: "_blank", rel: "noopener noreferrer" }, "Facebook csoport"),
+        React.createElement("span", { "aria-hidden": "true" }, "·"),
+        React.createElement("a", { href: "mailto:janos.rozsavolgyi2@gmail.com" }, "Kapcsolat"),
+        React.createElement("span", { "aria-hidden": "true" }, "·"),
+        React.createElement("button", { className: "footer-legal-btn", onClick: () => setLegalOpen("privacy") }, "Adatvédelem"),
+        React.createElement("span", { "aria-hidden": "true" }, "·"),
+        React.createElement("button", { className: "footer-legal-btn", onClick: () => setLegalOpen("terms") }, "Feltételek")
+      ),
+      React.createElement("p", { className: "tabloid-footer-copy" }, `© ${new Date().getFullYear()} ${APP_NAME}`)
+    )
   );
 }
 

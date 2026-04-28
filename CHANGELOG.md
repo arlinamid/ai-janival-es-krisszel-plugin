@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.5] - 2026-04-28
+
+### Hozzáadva
+- `PRIVACY.md` és `TERMS.md` adatvédelmi nyilatkozat és felhasználási feltételek (általános, technikai részletek nélkül).
+- In-app jogi modal: a footer „Adatvédelem" és „Feltételek" linkjei alulról felcsúszó panelben jelenítik meg a tartalmakat.
+
 ## [0.4.4] - 2026-04-28
 
 ### Javítva
