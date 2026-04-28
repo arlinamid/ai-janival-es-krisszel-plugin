@@ -2382,9 +2382,9 @@ function FounderCard({ founder: f }) {
   );
 }
 
-// ─── TrendingSection ──────────────────────────────────────────────────────────
+// ─── LatestSection ────────────────────────────────────────────────────────────
 function TrendingSection({ posts }) {
-  const top = posts.slice(0, 5);
+  const top = posts.slice(0, 6);
   if (!top.length) return null;
   return React.createElement(
     "section",
@@ -2392,24 +2392,36 @@ function TrendingSection({ posts }) {
     React.createElement(
       "div",
       { className: "tabloid-section-header" },
-      React.createElement("span", null, "LEGFELKAPOTTABB")
+      React.createElement("span", null, "LEGÚJABB")
     ),
     React.createElement(
-      "ol",
-      { className: "trending-list", role: "list" },
+      "div",
+      { className: "latest-tile-grid" },
       top.map((r, i) => {
         const title = firstHeading(recordToText(r)) || "Cím nélkül";
         const url = getPostUrl(r);
         const cat = categorizeRecord(r);
+        const color = CATEGORY_COLORS[cat] || "#e3061b";
+        const image = firstImage(r);
         return React.createElement(
-          "li",
-          { key: r.postId || i, className: "trending-item", role: "listitem" },
-          React.createElement("span", { className: "trending-num" }, i + 1),
+          "button",
+          {
+            key: r.postId || i,
+            type: "button",
+            className: "latest-tile",
+            style: !image ? { background: color + "22", borderColor: color } : {},
+            onClick: () => url && openPostUrl(url),
+            "aria-label": title
+          },
+          image
+            ? React.createElement("img", { src: image, alt: "", className: "latest-tile-img", loading: "lazy" })
+            : React.createElement("div", { className: "latest-tile-no-img", style: { color } },
+                React.createElement(Icon, { name: "FileText", size: 18 })),
           React.createElement(
-            "button",
-            { type: "button", className: "trending-btn", onClick: () => url && openPostUrl(url) },
-            React.createElement("span", { className: "trending-cat", style: { color: CATEGORY_COLORS[cat] || "#e3061b" } }, cat),
-            React.createElement("span", { className: "trending-title" }, title)
+            "div",
+            { className: "latest-tile-overlay" },
+            React.createElement("span", { className: "latest-tile-cat", style: { color: image ? "#fff" : color } }, cat),
+            React.createElement("span", { className: "latest-tile-title" }, title)
           )
         );
       })

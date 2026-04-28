@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.5] - 2026-04-28
+
+### Módosítva
+- „LEGFELKAPOTTABB" szekció átnevezve **„LEGÚJABB"**-ra — a felirat most helyesen tükrözi, hogy a legfrissebb posztok láthatók (nem valódi trending-metrika alapján).
+- „LEGÚJABB" szekció vizuális megjelenése: a számozott lista helyett **2 oszlopos csempe (tile) rács** jelenik meg; minden csempén kategóriacímke + cím, kép esetén gradiens-overlay, kép nélkül kategória-színes háttér.
+- „LEGÚJABB" szekció 5 poszt helyett **6 posztot** mutat (páros szám a 2 oszlopos elrendezéshez).
+- GitHub Actions CI/CD workflow hozzáadva: `v*` tag pusholásakor automatikusan buildelés és GitHub Release létrehozása a zip-fájllal.
+- `updates.xml` hozzáadva a Chrome extension auto-update mechanizmushoz.
+
+## [0.3.4] - 2026-04-28
+
+### Módosítva
+- Profilképek WebP formátumba konvertálva, 200×200 px-re vágva (~10 KB/kép, volt 21–890 KB).
+
 ## [0.3.3] - 2026-04-27
 
 ### Hozzáadva

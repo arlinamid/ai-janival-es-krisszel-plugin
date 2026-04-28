@@ -1575,60 +1575,80 @@ h1 {
 }
 .founders-discord:hover { text-decoration: underline; }
 
-/* ── Trending ────────────────────────────────────────────────── */
-.trending-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+/* ── Latest tiles ────────────────────────────────────────────── */
+.latest-tile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 10px 14px 14px;
 }
 
-.trending-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 14px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.trending-num {
-  font-family: var(--t-display);
-  font-size: 26px;
-  font-weight: 900;
-  color: #e8e8e8;
-  line-height: 1;
-  flex-shrink: 0;
-  width: 24px;
-  text-align: center;
-}
-
-.trending-btn {
-  flex: 1;
-  min-width: 0;
-  text-align: left;
-  background: none;
-  border: none;
+.latest-tile {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #e8e8e8;
+  border: 1px solid #e0e0e0;
   cursor: pointer;
-  padding: 0;
+  aspect-ratio: 4 / 3;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  justify-content: flex-end;
+  padding: 0;
+  text-align: left;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.trending-cat {
-  font-size: 9px;
+.latest-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  border-color: transparent;
+}
+
+.latest-tile-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.latest-tile-no-img {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+}
+
+.latest-tile-overlay {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.18) 70%, transparent 100%);
+  padding: 18px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.latest-tile-cat {
+  font-size: 8px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
+  opacity: 0.9;
 }
 
-.trending-title {
+.latest-tile-title {
   font-family: var(--t-display);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #fff;
   line-height: 1.3;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
