@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.9] - 2026-04-28
+
+### Javítva
+- `host_permissions`: `https://quoridor-snowy.vercel.app/*` hozzáadva Chrome és Firefox manifesthez — az extension kapja meg az engedélyt az iframe betöltéséhez.
+- Firefox CSP `connect-src` kiegészítve a Quoridor domain-nel.
+
 ## [0.4.8] - 2026-04-28
 
 ### Módosítva
