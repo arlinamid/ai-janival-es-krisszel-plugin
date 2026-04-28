@@ -1581,6 +1581,7 @@ function App() {
   );
   const [updateInfo, setUpdateInfo] = useState(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
   const [announcedIds, setAnnouncedIds] = useState({ status: "loading", ids: new Set() });
 
   const sessionRef = useRef(null);
@@ -2083,14 +2084,6 @@ function App() {
           onClose: () => setShowHistory(false)
         })
       : null,
-    notice
-      ? React.createElement(
-          "section",
-          { className: "notice" },
-          React.createElement(Icon, { name: "TriangleAlert", size: 17 }),
-          React.createElement("span", null, notice)
-        )
-      : null,
     updateInfo && !updateDismissed
       ? React.createElement(
           "section",
@@ -2128,6 +2121,24 @@ function App() {
       : null,
     activeTab === "game"
       ? React.createElement(GamePage, null)
+      : null,
+    activeTab === "chat" && notice && !noticeDismissed
+      ? React.createElement(
+          "section",
+          { className: "notice" },
+          React.createElement(Icon, { name: "TriangleAlert", size: 17 }),
+          React.createElement("span", null, notice),
+          React.createElement(
+            "button",
+            {
+              type: "button",
+              className: "notice-close",
+              onClick: () => setNoticeDismissed(true),
+              "aria-label": "Bezárás"
+            },
+            React.createElement(Icon, { name: "X", size: 13 })
+          )
+        )
       : null,
     activeTab === "chat" && !aiTermsAccepted
       ? React.createElement(AiTermsScreen, {

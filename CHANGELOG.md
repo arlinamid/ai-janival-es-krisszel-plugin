@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.3] - 2026-04-28
+
+### Javítva
+- Chrome: `manifest.json` (gyökérmappa) szinkronizálva — v0.3.9 helyett mostantól mindig az aktuális Chrome manifest van.
+- Chrome: `setPanelBehavior` top-level hívás a `background.js`-ben — service worker újraindulás után is megnyílik a sidepanel.
+- Figyelmeztetés (AI chat nem elérhető): csak AI chat tab aktív esetén jelenik meg, nem tolva ki az event bannert.
+- Figyelmeztetés bezárható X gombbal.
+
 ## [0.5.1] - 2026-04-28
 
 ### Javítva

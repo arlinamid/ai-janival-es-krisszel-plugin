@@ -176,7 +176,6 @@ h1 {
 }
 
 .notice {
-  grid-row: 2;
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -186,6 +185,24 @@ h1 {
   font-size: 13px;
   line-height: 1.45;
   padding: 10px 12px;
+}
+.notice span {
+  flex: 1;
+}
+.notice-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  padding: 1px 2px;
+  line-height: 1;
+  border-radius: 3px;
+}
+.notice-close:hover {
+  opacity: 1;
+  background: rgba(0,0,0,0.08);
 }
 
 .update-banner {
@@ -703,6 +720,9 @@ h1 {
   .notice {
     background: #312b18;
     color: #f1df9b;
+  }
+  .notice-close:hover {
+    background: rgba(255,255,255,0.12);
   }
 }
 
