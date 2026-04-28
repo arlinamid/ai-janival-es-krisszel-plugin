@@ -159,7 +159,6 @@ function createZip(releaseDir, zipPath) {
   if (!fs.existsSync(RELEASES)) fs.mkdirSync(RELEASES, { recursive: true });
   if (fs.existsSync(zipPath)) fs.rmSync(zipPath, { force: true });
 
-  const releaseName = path.basename(releaseDir);
   const localParts = [];
   const centralParts = [];
   let offset = 0;
@@ -168,7 +167,7 @@ function createZip(releaseDir, zipPath) {
   files.forEach((file) => {
     const data = fs.readFileSync(file.fullPath);
     const compressed = zlib.deflateRawSync(data, { level: 9 });
-    const name = Buffer.from(`${releaseName}/${file.relativePath}`, "utf8");
+    const name = Buffer.from(file.relativePath, "utf8");
     const stat = fs.statSync(file.fullPath);
     const { dosDate, dosTime } = toDosDateTime(stat.mtime);
     const crc = crc32(data);
