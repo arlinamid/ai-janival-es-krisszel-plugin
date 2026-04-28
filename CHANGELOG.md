@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.8] - 2026-04-28
+
+### Javítva
+- Firefox XHR relay: `Cache-Control: no-store` + `Pragma: no-cache` hozzáadva — szerver nem adhat vissza gyorsítótárazott JSON-t.
+
 ## [0.5.7] - 2026-04-28
 
 ### Módosítva

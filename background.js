@@ -192,6 +192,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", `${message.url}?t=${Date.now()}`);
     xhr.responseType = "json";
+    xhr.setRequestHeader("Cache-Control", "no-store");
+    xhr.setRequestHeader("Pragma", "no-cache");
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         sendResponse({ ok: true, data: xhr.response });
