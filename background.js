@@ -158,6 +158,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         : null;
 
     if (!target || !chrome.sidePanel?.open) {
+      // Firefox fallback: sidebar_action API
+      if (typeof browser !== "undefined" && browser.sidebarAction?.open) {
+        browser.sidebarAction.open()
+          .then(() => sendResponse({ ok: true }))
+          .catch((err) => sendResponse({ ok: false, error: String(err) }));
+        return true;
+      }
       sendResponse({ ok: false, error: "Side panel open API is not available." });
       return false;
     }

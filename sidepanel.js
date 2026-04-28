@@ -1596,7 +1596,7 @@ function App() {
     if (!("LanguageModel" in self)) {
       setModelAvailable(false);
       setNotice(
-        "A LanguageModel API nem érhető el. Chrome 138+ desktop böngésző és beépített AI támogatás szükséges."
+        "A beépített AI chat csak Chrome 138+ desktop böngészőben érhető el. A poszt feed, mentett posztok és keresés minden böngészőben működik."
       );
       setStatus("Nem elérhető.");
       return;
