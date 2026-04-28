@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.4] - 2026-04-28
+
+### Javítva
+- Firefox fetch: background relay `XMLHttpRequest`-re váltva (Firefox `host_permissions` CORS-bypass XHR-rel megbízhatóbb mint `fetch()`).
+- Firefox manifest: explicit `connect-src` CSP hozzáadva az `extension_pages` CSP-hez.
+
 ## [0.4.3] - 2026-04-28
 
 ### Javítva

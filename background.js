@@ -150,15 +150,30 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return false;
 
-  // Relay fetch through background to bypass Firefox CORS restrictions on extension pages
+  // Relay fetch through background to bypass Firefox CORS restrictions on extension pages.
+  // Uses XHR which respects host_permissions cross-origin bypass in Firefox extensions.
   if (message?.type === "FETCH_JSON") {
-    fetch(`${message.url}?t=${Date.now()}`, { cache: "no-store" })
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then((data) => sendResponse({ ok: true, data }))
-      .catch((err) => sendResponse({ ok: false, error: String(err) }));
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", `${message.url}?t=${Date.now()}`);
+    xhr.responseType = "json";
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        sendResponse({ ok: true, data: xhr.response });
+      } else {
+        sendResponse({ ok: false, error: `HTTP ${xhr.status}` });
+      }
+    };
+    xhr.onerror = () => {
+      // XHR fallback to fetch (Chrome service worker may not support XHR)
+      fetch(`${message.url}?t=${Date.now()}`, { cache: "no-store" })
+        .then((r) => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.json();
+        })
+        .then((data) => sendResponse({ ok: true, data }))
+        .catch((err) => sendResponse({ ok: false, error: String(err) }));
+    };
+    xhr.send();
     return true;
   }
 
