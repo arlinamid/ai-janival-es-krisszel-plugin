@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.5] - 2026-04-28
+
+### Javítva
+- Chrome: `content_security_policy.extension_pages` hozzáadva `frame-src https://quoridor-snowy.vercel.app;` — Chrome extension oldalak alapértelmezett CSP-je blokkolja az iframe-eket, ezért kellett explicit engedély.
+
 ## [0.5.4] - 2026-04-28
 
 ### Javítva
