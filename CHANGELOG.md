@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.2] - 2026-04-28
+
+### Javítva
+- Firefox manifest: `background.service_worker` helyett `background.scripts` — megszünteti a `BACKGROUND_SERVICE_WORKER_NOFALLBACK` hibát, ami "corrupt add-on" üzenetet okozott telepítéskor.
+- Firefox build: `background.js` IIFE formátumban épül (volt: ESM), Firefox event page kompatibilitás.
+
 ## [0.4.1] - 2026-04-28
 
 ### Javítva

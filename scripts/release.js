@@ -80,12 +80,14 @@ async function runEsbuildBundle(browserTarget) {
     sourcemap: false
   });
 
+  // Firefox uses background.scripts (event page) → IIFE; Chrome uses service_worker → ESM
+  const bgFormat = browserTarget === "firefox" ? "iife" : "esm";
   await esbuild.build({
     entryPoints: [path.join(ROOT, "background.js")],
     bundle: true,
     outfile: path.join(DIST, "background.js"),
     platform: "browser",
-    format: "esm",
+    format: bgFormat,
     target,
     minify: true,
     sourcemap: false
