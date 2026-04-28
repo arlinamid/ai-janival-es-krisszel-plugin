@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.6] - 2026-04-28
+
+### Hozzáadva
+- `AjánlóSection`: új kiemelt poszt szekció a landing oldalon, az `announcements.json`-ban szereplő posztokat mutatja csempe (tile) formátumban az Alapítók szekció alatt.
+- `loadAnnouncements()`: lekéri az `http://ai-janival-es-krisszel.hu/announcements.json` fájlt és visszaadja a kiemelt postId-k `Set`-jét.
+
+### Módosítva
+- Adatforrás migráció: `database/posts-categorized.json` (lokális) → `http://ai-janival-es-krisszel.hu/posts-categorized.json` (HTTP, no-cache).
+- `loadLatestPosts()` és `loadKnowledgeBase()` mostantól HTTP-ről tölt le, `cache: "no-store"` opcióval.
+- Hero Carousel: az `announcements.json`-ban szereplő képes posztokat mutatja (fallback: legfrissebb képes posztok, ha nincs announcement).
+- `manifest.json`: `http://ai-janival-es-krisszel.hu/*` és `https://ai-janival-es-krisszel.hu/*` hozzáadva a `host_permissions`-höz (www nélküli verzió).
+
 ## [0.3.5] - 2026-04-28
 
 ### Módosítva

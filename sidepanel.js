@@ -67,7 +67,8 @@ const ICON_MAP = {
 import { marked } from "marked";
 
 const SUPPORTED_TEXT_LANGUAGES = ["en", "es", "ja"];
-const KNOWLEDGE_FILES = ["database/posts-categorized.json"];
+const POSTS_URL = "http://ai-janival-es-krisszel.hu/posts-categorized.json";
+const ANNOUNCEMENTS_URL = "http://ai-janival-es-krisszel.hu/announcements.json";
 const MAX_CONTEXT_CHARS = 7000;
 const DEFAULT_GROUP_POST_BASE =
   "https://www.facebook.com/groups/ai.janival.es.krisszel/posts/";
@@ -540,19 +541,23 @@ function firstImage(record) {
 }
 
 async function loadLatestPosts() {
-  const fileName = KNOWLEDGE_FILES[0];
-  const url = self.chrome?.runtime?.getURL ? chrome.runtime.getURL(fileName) : fileName;
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`${fileName}: HTTP ${response.status}`);
-  }
-
+  const response = await fetch(`${POSTS_URL}?t=${Date.now()}`, { cache: "no-store" });
+  if (!response.ok) throw new Error(`posts-categorized.json: HTTP ${response.status}`);
   const data = await response.json();
-
   return asRecordList(data)
     .map((record, index) => ({ ...record, __index: index }))
     .sort((a, b) => recordTimestamp(b) - recordTimestamp(a) || a.__index - b.__index);
+}
+
+async function loadAnnouncements() {
+  try {
+    const response = await fetch(`${ANNOUNCEMENTS_URL}?t=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) return new Set();
+    const data = await response.json();
+    return new Set(Array.isArray(data.postIds) ? data.postIds.map(String) : []);
+  } catch {
+    return new Set();
+  }
 }
 
 function fetchSchedule() {
@@ -934,25 +939,14 @@ function buildAuthorIndex(documents) {
 }
 
 async function loadKnowledgeBase() {
-  const loaded = [];
-  const documents = [];
-
-  for (const fileName of KNOWLEDGE_FILES) {
-    const url = self.chrome?.runtime?.getURL ? chrome.runtime.getURL(fileName) : fileName;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`${fileName}: HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    const fileDocuments = createDocuments(data, fileName);
-
-    documents.push(...fileDocuments);
-    loaded.push({ fileName, records: asRecordList(data).length, chunks: fileDocuments.length });
-  }
-
-  return buildKnowledgeIndex(documents, loaded);
+  const response = await fetch(`${POSTS_URL}?t=${Date.now()}`, { cache: "no-store" });
+  if (!response.ok) throw new Error(`posts-categorized.json: HTTP ${response.status}`);
+  const data = await response.json();
+  const fileName = "posts-categorized.json";
+  const fileDocuments = createDocuments(data, fileName);
+  return buildKnowledgeIndex(fileDocuments, [
+    { fileName, records: asRecordList(data).length, chunks: fileDocuments.length }
+  ]);
 }
 
 function detectAuthor(index, query) {
@@ -1568,6 +1562,7 @@ function App() {
   );
   const [updateInfo, setUpdateInfo] = useState(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
+  const [announcedIds, setAnnouncedIds] = useState({ status: "loading", ids: new Set() });
 
   const sessionRef = useRef(null);
   const abortRef = useRef(null);
@@ -1706,6 +1701,16 @@ function App() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadAnnouncements().then((ids) => {
+      if (!cancelled) setAnnouncedIds({ status: "ready", ids });
+    }).catch(() => {
+      if (!cancelled) setAnnouncedIds({ status: "ready", ids: new Set() });
+    });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -2070,7 +2075,7 @@ function App() {
     React.createElement(EventBanner, { nextEvent, compact: true }),
     React.createElement(TabBar, { activeTab, onTabChange: setActiveTab }),
     activeTab === "home"
-      ? React.createElement(HomePage, { latestPosts, nextEvent, knowledgeRef })
+      ? React.createElement(HomePage, { latestPosts, nextEvent, knowledgeRef, announcedIds })
       : null,
     activeTab === "tools"
       ? React.createElement(PluginToolsPage, null)
@@ -2431,6 +2436,52 @@ function FounderCard({ founder: f }) {
   );
 }
 
+// ─── AjánlóSection ────────────────────────────────────────────────────────────
+function AjanlóSection({ posts }) {
+  if (!posts.length) return null;
+  return React.createElement(
+    "section",
+    { className: "tabloid-section ajanlо-section" },
+    React.createElement(
+      "div",
+      { className: "tabloid-section-header" },
+      React.createElement("span", null, "AJÁNLÓ")
+    ),
+    React.createElement(
+      "div",
+      { className: "latest-tile-grid" },
+      posts.map((r, i) => {
+        const title = firstHeading(recordToText(r)) || "Cím nélkül";
+        const url = getPostUrl(r);
+        const cat = categorizeRecord(r);
+        const color = CATEGORY_COLORS[cat] || "#e3061b";
+        const image = firstImage(r);
+        return React.createElement(
+          "button",
+          {
+            key: r.postId || i,
+            type: "button",
+            className: "latest-tile ajanlо-tile",
+            style: !image ? { background: color + "22", borderColor: color } : {},
+            onClick: () => url && openPostUrl(url),
+            "aria-label": title
+          },
+          image
+            ? React.createElement("img", { src: image, alt: "", className: "latest-tile-img", loading: "lazy" })
+            : React.createElement("div", { className: "latest-tile-no-img", style: { color } },
+                React.createElement(Icon, { name: "FileText", size: 18 })),
+          React.createElement(
+            "div",
+            { className: "latest-tile-overlay" },
+            React.createElement("span", { className: "latest-tile-cat", style: { color: image ? "#fff" : color } }, cat),
+            React.createElement("span", { className: "latest-tile-title" }, title)
+          )
+        );
+      })
+    )
+  );
+}
+
 // ─── LatestSection ────────────────────────────────────────────────────────────
 function TrendingSection({ posts }) {
   const top = posts.slice(0, 6);
@@ -2575,12 +2626,16 @@ function TabloidFooter() {
 }
 
 // ─── HomePage (Tabloid) ───────────────────────────────────────────────────────
-function HomePage({ latestPosts, nextEvent, knowledgeRef }) {
+function HomePage({ latestPosts, nextEvent, knowledgeRef, announcedIds }) {
   const [activeCategory, setActiveCategory] = useState("Mind");
   const [searchQuery, setSearchQuery] = useState("");
 
   const records = latestPosts.records || [];
   const annotated = records.map((r) => ({ ...r, _cat: categorizeRecord(r) }));
+
+  const ids = announcedIds?.ids || new Set();
+  const announcedPosts = annotated.filter((r) => r.postId && ids.has(String(r.postId)));
+  const carouselPosts = announcedPosts.filter((r) => firstImage(r));
 
   const filtered = (() => {
     if (searchQuery.trim() && knowledgeRef?.current) {
@@ -2598,9 +2653,12 @@ function HomePage({ latestPosts, nextEvent, knowledgeRef }) {
     { className: "tab-page tabloid-page" },
     React.createElement(BreakingTicker, { event: nextEvent.event }),
     latestPosts.status === "ready"
-      ? React.createElement(HeroCarousel, { posts: annotated })
+      ? React.createElement(HeroCarousel, { posts: carouselPosts.length ? carouselPosts : annotated })
       : null,
     React.createElement(FoundersSection),
+    announcedPosts.length
+      ? React.createElement(AjanlóSection, { posts: announcedPosts })
+      : null,
     latestPosts.status === "ready"
       ? React.createElement(TrendingSection, { posts: annotated })
       : null,
