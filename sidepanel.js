@@ -1566,6 +1566,8 @@ function App() {
   const [aiTermsAccepted, setAiTermsAccepted] = useState(
     () => localStorage.getItem(AI_TERMS_KEY) === "1"
   );
+  const [updateInfo, setUpdateInfo] = useState(null);
+  const [updateDismissed, setUpdateDismissed] = useState(false);
 
   const sessionRef = useRef(null);
   const abortRef = useRef(null);
@@ -1743,6 +1745,26 @@ function App() {
   }, [messages, isBusy]);
 
   useEffect(() => resetSession, [resetSession]);
+
+  // Update-ellenőrzés: storage olvasás + figyelés
+  useEffect(() => {
+    const FBS_UPDATE_KEY = "fbs_update_available";
+    if (self.chrome?.storage?.local) {
+      chrome.storage.local.get(FBS_UPDATE_KEY, (result) => {
+        if (result[FBS_UPDATE_KEY]) setUpdateInfo(result[FBS_UPDATE_KEY]);
+      });
+      const listener = (changes, area) => {
+        if (area !== "local") return;
+        if (changes[FBS_UPDATE_KEY]) {
+          const nv = changes[FBS_UPDATE_KEY].newValue;
+          setUpdateInfo(nv || null);
+          if (nv) setUpdateDismissed(false);
+        }
+      };
+      chrome.storage.onChanged.addListener(listener);
+      return () => chrome.storage.onChanged.removeListener(listener);
+    }
+  }, []);
 
   // Legutóbbi session betöltése induláskor
   useEffect(() => {
@@ -2016,6 +2038,33 @@ function App() {
           { className: "notice" },
           React.createElement(Icon, { name: "TriangleAlert", size: 17 }),
           React.createElement("span", null, notice)
+        )
+      : null,
+    updateInfo && !updateDismissed
+      ? React.createElement(
+          "section",
+          { className: "update-banner" },
+          React.createElement(Icon, { name: "ArrowUpCircle", size: 15 }),
+          React.createElement(
+            "span",
+            null,
+            `Új verzió elérhető: v${updateInfo.version} — `,
+            React.createElement(
+              "a",
+              { href: updateInfo.url, target: "_blank", rel: "noopener noreferrer" },
+              "Letöltés GitHubról"
+            )
+          ),
+          React.createElement(
+            "button",
+            {
+              type: "button",
+              className: "update-banner-close",
+              onClick: () => setUpdateDismissed(true),
+              "aria-label": "Bezárás"
+            },
+            React.createElement(Icon, { name: "X", size: 13 })
+          )
         )
       : null,
     React.createElement(EventBanner, { nextEvent, compact: true }),

@@ -188,6 +188,51 @@ h1 {
   padding: 10px 12px;
 }
 
+.update-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #a5d6a7;
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 8px 12px;
+}
+
+.update-banner a {
+  color: #2e7d32;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.update-banner-close {
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #2e7d32;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.update-banner-close:hover { opacity: 1; }
+
+@media (prefers-color-scheme: dark) {
+  .update-banner {
+    background: #0d2b14;
+    border-color: #2e6b38;
+    color: #a5d6a7;
+  }
+  .update-banner a { color: #66bb6a; }
+  .update-banner-close { color: #66bb6a; }
+}
+
 .tab-bar {
   grid-row: 3;
   display: grid;

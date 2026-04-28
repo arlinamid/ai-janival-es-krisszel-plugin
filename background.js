@@ -2,6 +2,11 @@ const SCHEDULE_URL = "http://www.ai-janival-es-krisszel.hu/schedule.json";
 const ALARM_NAME = "fbs-live-check";
 const CHECK_INTERVAL_MINUTES = 5;
 
+const UPDATE_ALARM = "fbs-update-check";
+const UPDATE_CHECK_INTERVAL_MINUTES = 6 * 60; // 6 óránként
+const GITHUB_RELEASES_API = "https://api.github.com/repos/arlinamid/ai-janival-es-krisszel-plugin/releases/latest";
+const UPDATE_STORAGE_KEY = "fbs_update_available";
+
 const WEEKDAYS = {
   sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
   thursday: 4, friday: 5, saturday: 6
@@ -68,12 +73,53 @@ async function updateBadge() {
   }
 }
 
+async function checkForUpdates() {
+  try {
+    const current = chrome.runtime.getManifest().version;
+    const res = await fetch(GITHUB_RELEASES_API, {
+      cache: "no-store",
+      headers: { Accept: "application/vnd.github+json" }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const latest = (data.tag_name || "").replace(/^v/, "");
+    if (!latest) return;
+
+    const toNum = (v) => v.split(".").map((n) => parseInt(n, 10) || 0);
+    const [lA, lB, lC] = toNum(latest);
+    const [cA, cB, cC] = toNum(current);
+    const isNewer = lA > cA || (lA === cA && lB > cB) || (lA === cA && lB === cB && lC > cC);
+
+    if (isNewer) {
+      await chrome.storage.local.set({
+        [UPDATE_STORAGE_KEY]: {
+          version: latest,
+          url: data.html_url || `https://github.com/arlinamid/ai-janival-es-krisszel-plugin/releases/latest`,
+          checkedAt: Date.now()
+        }
+      });
+    } else {
+      await chrome.storage.local.remove(UPDATE_STORAGE_KEY);
+    }
+  } catch (err) {
+    console.warn("[FBS] Update check failed:", err);
+  }
+}
+
 function setupAlarm() {
   chrome.alarms.get(ALARM_NAME, (alarm) => {
     if (!alarm) {
       chrome.alarms.create(ALARM_NAME, {
         delayInMinutes: 0,
         periodInMinutes: CHECK_INTERVAL_MINUTES
+      });
+    }
+  });
+  chrome.alarms.get(UPDATE_ALARM, (alarm) => {
+    if (!alarm) {
+      chrome.alarms.create(UPDATE_ALARM, {
+        delayInMinutes: 1,
+        periodInMinutes: UPDATE_CHECK_INTERVAL_MINUTES
       });
     }
   });
@@ -87,17 +133,18 @@ chrome.runtime.onInstalled.addListener(async () => {
   }
   setupAlarm();
   updateBadge();
+  checkForUpdates();
 });
 
 chrome.runtime.onStartup.addListener(() => {
   setupAlarm();
   updateBadge();
+  checkForUpdates();
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === ALARM_NAME) {
-    updateBadge();
-  }
+  if (alarm.name === ALARM_NAME) updateBadge();
+  if (alarm.name === UPDATE_ALARM) checkForUpdates();
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

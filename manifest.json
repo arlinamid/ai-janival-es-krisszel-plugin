@@ -3,7 +3,6 @@
   "name": "AI - Janival és Krisszel",
   "description": "Friss posztok, mentett Facebook-bejegyzések és Chrome beépített AI chat egy side panelben.",
   "version": "0.3.5",
-  "update_url": "https://raw.githubusercontent.com/arlinamid/ai-janival-es-krisszel-plugin/master/updates.xml",
   "minimum_chrome_version": "138",
   "permissions": ["sidePanel", "storage", "clipboardWrite", "tabs", "alarms"],
   "host_permissions": [
