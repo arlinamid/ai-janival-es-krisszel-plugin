@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.7] - 2026-04-28
+
+### Eltávolítva
+- `database/posts-categorized.json` és `database/posts.json` törölve a repóból — az adatok mostantól kizárólag HTTP-ről érkeznek (`http://ai-janival-es-krisszel.hu/posts-categorized.json`).
+
 ## [0.3.6] - 2026-04-28
 
 ### Hozzáadva
