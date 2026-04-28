@@ -3,6 +3,35 @@ if (typeof chrome !== "undefined" && chrome.sidePanel?.setPanelBehavior) {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
 }
 
+// Strip CSP/X-Frame-Options from Quoridor iframe responses so Chrome allows framing.
+// frame-ancestors * does NOT cover chrome-extension:// scheme (Chromium bug crbug.com/1447888).
+const QUORIDOR_RULE_ID = 100;
+async function setupQuoridorFrameRule() {
+  try {
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: [QUORIDOR_RULE_ID],
+      addRules: [{
+        id: QUORIDOR_RULE_ID,
+        priority: 1,
+        action: {
+          type: "modifyHeaders",
+          responseHeaders: [
+            { header: "x-frame-options", operation: "remove" },
+            { header: "content-security-policy", operation: "remove" }
+          ]
+        },
+        condition: {
+          requestDomains: ["quoridor-snowy.vercel.app"],
+          initiatorDomains: [chrome.runtime.id],
+          resourceTypes: ["sub_frame"]
+        }
+      }]
+    });
+  } catch (err) {
+    console.warn("[FBS] Quoridor frame rule setup failed:", err);
+  }
+}
+
 const SCHEDULE_URL = "http://www.ai-janival-es-krisszel.hu/schedule.json";
 const ALARM_NAME = "fbs-live-check";
 const CHECK_INTERVAL_MINUTES = 5;
@@ -139,12 +168,14 @@ chrome.runtime.onInstalled.addListener(async () => {
   setupAlarm();
   updateBadge();
   checkForUpdates();
+  setupQuoridorFrameRule();
 });
 
 chrome.runtime.onStartup.addListener(() => {
   setupAlarm();
   updateBadge();
   checkForUpdates();
+  setupQuoridorFrameRule();
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {

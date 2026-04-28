@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.6] - 2026-04-28
+
+### Javítva
+- Quoridor iframe Chrome + Firefox: `declarativeNetRequest` dinamikus szabály strip-eli a `content-security-policy` és `x-frame-options` headereket a Quoridor válaszából, de CSAK ha a kérés az extensionből indul (`initiatorDomains`). A `frame-ancestors *` nem tartalmazza a `chrome-extension://` sémát (Chromium bug crbug.com/1447888), ezért nem volt elég a manifest CSP.
+- `declarativeNetRequest` permission hozzáadva mindkét manifestbe.
+
 ## [0.5.5] - 2026-04-28
 
 ### Javítva
