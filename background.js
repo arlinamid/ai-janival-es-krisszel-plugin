@@ -1,3 +1,8 @@
+// Ensure side panel opens on action click every time the service worker activates
+if (typeof chrome !== "undefined" && chrome.sidePanel?.setPanelBehavior) {
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
+}
+
 const SCHEDULE_URL = "http://www.ai-janival-es-krisszel.hu/schedule.json";
 const ALARM_NAME = "fbs-live-check";
 const CHECK_INTERVAL_MINUTES = 5;
