@@ -1713,6 +1713,33 @@ function App() {
     return () => { cancelled = true; };
   }, []);
 
+  // 10 percenkénti adat-frissítés (posztok + ajánló)
+  useEffect(() => {
+    const INTERVAL_MS = 10 * 60 * 1000;
+    let timer = null;
+
+    async function refresh() {
+      try {
+        const [records, ids] = await Promise.all([loadLatestPosts(), loadAnnouncements()]);
+        setLatestPosts((prev) => {
+          const prevIds = new Set((prev.records || []).map((r) => r.postId));
+          const hasNew = records.some((r) => r.postId && !prevIds.has(r.postId));
+          return hasNew || prev.status !== "ready"
+            ? { status: "ready", records, error: "" }
+            : prev;
+        });
+        setAnnouncedIds({ status: "ready", ids });
+      } catch {
+        // csendesen ignoráljuk, marad a régi adat
+      } finally {
+        if (timer !== null) timer = setTimeout(refresh, INTERVAL_MS);
+      }
+    }
+
+    timer = setTimeout(refresh, INTERVAL_MS);
+    return () => { if (timer !== null) clearTimeout(timer); timer = null; };
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
