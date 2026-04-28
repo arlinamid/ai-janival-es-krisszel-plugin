@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0] - 2026-04-28
+
+### Módosítva
+- Quoridor game tab: Chrome-ban `<webview partition="persist:quoridor">` — állandó, sessionök között megmaradó cookies és localStorage; Firefox-ban `<iframe>` marad.
+- `host_permissions`: `https://*.supabase.co/*` hozzáadva (Quoridor auth API hívásokhoz).
+- Firefox manifest: `frame-src https://quoridor-snowy.vercel.app` hozzáadva a CSP-hez.
+
 ## [0.4.9] - 2026-04-28
 
 ### Javítva
